@@ -4,6 +4,20 @@ DEFAULT COLLATE utf8mb4_general_ci;
 
 USE wkcomercial;
 
+CREATE USER 'development'@'localhost' IDENTIFIED BY 'deV$933068';
+
+GRANT ALL PRIVILEGES ON *.* TO 'development'@'localhost' WITH GRANT OPTION;
+
+FLUSH PRIVILEGES;
+
+SHOW GRANTS FOR 'development'@'localhost';
+
+ALTER USER 'development'@'localhost' 
+IDENTIFIED WITH mysql_native_password 
+BY 'deV$933068';
+
+SELECT user, host, plugin FROM mysql.user;
+
 CREATE TABLE clientes( 
 codigo INT NOT NULL AUTO_INCREMENT, 
 nome VARCHAR(255), 
