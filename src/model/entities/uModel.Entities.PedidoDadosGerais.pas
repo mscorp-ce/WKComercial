@@ -1,4 +1,4 @@
-unit uModel.Entities.PedidosDadosGerais;
+unit uModel.Entities.PedidoDadosGerais;
 
 interface
 
@@ -6,7 +6,7 @@ uses
   uModel.Entities.Cliente;
 
 type
-  TPedidosDadosGerais = class
+  TPedidoDadosGerais = class
   private
     FCliente: TCliente;
     FValorTotal: Currency;
@@ -28,41 +28,41 @@ type
 
 implementation
 
-{ TPedidosDadosGerais }
+{ TPedidoDadosGerais }
 
 uses
   System.SysUtils;
 
-constructor TPedidosDadosGerais.Create();
+constructor TPedidoDadosGerais.Create();
 begin
   inherited Create();
 
   FCliente := TCliente.Create();
 end;
 
-destructor TPedidosDadosGerais.Destroy();
+destructor TPedidoDadosGerais.Destroy();
 begin
   FreeAndNil(FCliente);
 
   inherited Destroy();
 end;
 
-procedure TPedidosDadosGerais.SetCliente(const Value: TCliente);
+procedure TPedidoDadosGerais.SetCliente(const Value: TCliente);
 begin
   FCliente := Value;
 end;
 
-procedure TPedidosDadosGerais.SetDataEmissao(const Value: TDate);
+procedure TPedidoDadosGerais.SetDataEmissao(const Value: TDate);
 begin
   FDataEmissao := Value;
 end;
 
-procedure TPedidosDadosGerais.SetNumeroPedido(const Value: Integer);
+procedure TPedidoDadosGerais.SetNumeroPedido(const Value: Integer);
 begin
   FNumeroPedido := Value;
 end;
 
-procedure TPedidosDadosGerais.SetValorTotal(const Value: Currency);
+procedure TPedidoDadosGerais.SetValorTotal(const Value: Currency);
 begin
   FValorTotal := Value;
 end;
