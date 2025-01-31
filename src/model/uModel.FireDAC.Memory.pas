@@ -4,7 +4,8 @@ interface
 
 uses
   System.Generics.Collections, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS,
-  FireDAC.Phys.Intf, FireDAC.DApt.Intf, Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, Datasnap.DBClient, uModel.Abstraction;
+  FireDAC.Phys.Intf, FireDAC.DApt.Intf, Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, Datasnap.DBClient, uModel.Abstraction,
+  System.Json;
 
 type
   TModelFireDACMemory = class(TInterfacedObject, IMemory)
@@ -12,6 +13,7 @@ type
     FData: TFDMemTable;
     FRecNo: Integer;
     procedure AddFields(const StructureData: String);
+    procedure AddDisplayFormat(const Fields: TJSONArray);
     function GetData(): TFDMemTable;
     procedure SetRecNo(const Value: Integer);
     function GetRecNo: Integer;
@@ -33,7 +35,27 @@ implementation
 { TModelFireDACMemory }
 
 uses
-  System.Classes, System.SysUtils, System.Json;
+  System.Classes, System.SysUtils;
+
+procedure TModelFireDACMemory.AddDisplayFormat(const Fields: TJSONArray);
+begin
+  for var i := 0 to Fields.Count - 1 do
+  begin
+    var Field := Fields.Items[i] as TJSONObject;
+    var FieldName: string;
+
+    if not Field.TryGetValue<string>('name', FieldName) then
+      Continue;
+
+    var DataField := FData.FieldByName(FieldName);
+    if Assigned(DataField) and (DataField is TNumericField) then
+      begin
+        var DisplayFormat: string;
+        if Field.TryGetValue<string>('displayFormat', DisplayFormat) then
+          TNumericField(DataField).DisplayFormat := DisplayFormat;
+      end;
+  end;
+end;
 
 procedure TModelFireDACMemory.AddFields(const StructureData: String);
 begin
@@ -59,6 +81,9 @@ begin
       end;
 
     FData.CreateDataSet();
+
+    AddDisplayFormat(Fields);
+
   finally
     JSONObject.Free;
   end;
