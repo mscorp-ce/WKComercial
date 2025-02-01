@@ -19,11 +19,11 @@ BY 'deV$933068';
 SELECT user, host, plugin FROM mysql.user;
 
 CREATE TABLE clientes( 
-codigo INT NOT NULL AUTO_INCREMENT, 
-nome VARCHAR(255), 
-cidade VARCHAR(50), 
-uf VARCHAR(2),
-CONSTRAINT PRIMARY KEY pk_cli(codigo)
+  codigo INT NOT NULL AUTO_INCREMENT, 
+  nome VARCHAR(255) NOT NULL, 
+  cidade VARCHAR(50), 
+  uf VARCHAR(2),
+  CONSTRAINT PRIMARY KEY pk_cli(codigo)
 );
 
 CREATE INDEX idx_clientes_nome ON clientes(nome);
@@ -62,10 +62,10 @@ INSERT INTO clientes(nome, cidade, uf) VALUES('Gustavo Moura', 'Caxias do Sul', 
 INSERT INTO clientes(nome, cidade, uf) VALUES('Letícia Carvalho', 'Sorocaba', 'SP');
 
 CREATE TABLE produtos(
-codigo INT NOT NULL AUTO_INCREMENT, 
-descricao VARCHAR(255),
-preco_venda DECIMAL(15,2),
-CONSTRAINT PRIMARY KEY pk_prod(codigo)
+  codigo INT NOT NULL AUTO_INCREMENT, 
+  descricao VARCHAR(255) NOT NULL,
+  preco_venda DECIMAL(15,2) NOT NULL,
+  CONSTRAINT PRIMARY KEY pk_prod(codigo)
 );
 
 CREATE INDEX idx_produtos_descricao ON produtos(descricao);
@@ -111,12 +111,12 @@ INSERT INTO produtos(descricao, preco_venda) VALUES('Iogurte', 6.50);
 INSERT INTO produtos(descricao, preco_venda) VALUES('Água Mineral', 2.00);
 
 CREATE TABLE pedidos_dados_gerais(
-numero_pedido INT NOT NULL AUTO_INCREMENT,  
-data_emissao DATE, 
-codigo_cliente INT NOT NULL,
-valor_total DECIMAL (15,2),
-CONSTRAINT PRIMARY KEY pk_ped(numero_pedido),
-CONSTRAINT FOREIGN KEY fk_cod_cli(codigo_cliente) REFERENCES clientes(codigo)
+  numero_pedido INT NOT NULL AUTO_INCREMENT,  
+  data_emissao DATE NOT NULL, 
+  codigo_cliente INT NOT NULL,
+  valor_total DECIMAL (15,2) DEFAULT 0,
+  CONSTRAINT PRIMARY KEY pk_ped(numero_pedido),
+  CONSTRAINT FOREIGN KEY fk_cod_cli(codigo_cliente) REFERENCES clientes(codigo)
 );
 
 CREATE INDEX idx_pedidos_data_emissao ON pedidos_dados_gerais(data_emissao);
@@ -137,15 +137,15 @@ END$$
 DELIMITER ;
 
 CREATE TABLE pedidos_produtos(
-autoincrem INT NOT NULL AUTO_INCREMENT,   
-numero_pedido INT NOT NULL, 
-codigo_produto INT NOT NULL,
-quantidade DECIMAL (15,2), 
-valor_unitario DECIMAL(15,2),
-valor_total DECIMAL (15,2), 
-CONSTRAINT PRIMARY KEY pk_ped_prod(autoincrem),
-CONSTRAINT FOREIGN KEY fk_ped_dad_ge(numero_pedido) REFERENCES pedidos_dados_gerais(numero_pedido) ON DELETE CASCADE,
-CONSTRAINT FOREIGN KEY fk_cod_prod(codigo_produto) REFERENCES produtos(codigo)
+  autoincrem INT NOT NULL AUTO_INCREMENT,   
+  numero_pedido INT NOT NULL, 
+  codigo_produto INT NOT NULL,
+  quantidade DECIMAL (15,2) NOT NULL, 
+  valor_unitario DECIMAL(15,2) NOT NULL,
+  valor_total DECIMAL (15,2) NOT NULL, 
+  CONSTRAINT PRIMARY KEY pk_ped_prod(autoincrem),
+  CONSTRAINT FOREIGN KEY fk_ped_dad_ge(numero_pedido) REFERENCES pedidos_dados_gerais(numero_pedido) ON DELETE CASCADE,
+  CONSTRAINT FOREIGN KEY fk_cod_prod(codigo_produto) REFERENCES produtos(codigo)
 );
 
 CREATE INDEX idx_pedidos_produtos_numero_pedido ON pedidos_produtos(numero_pedido);
@@ -165,6 +165,40 @@ BEGIN
     END IF;
 END$$
 
+CREATE TRIGGER trg_pedidos_produtos_ai
+AFTER INSERT ON pedidos_produtos
+FOR EACH ROW
+BEGIN
+    UPDATE pedidos_dados_gerais
+       SET valor_total = (SELECT COALESCE(SUM(valor_total), 0) 
+                            FROM pedidos_produtos 
+                            WHERE numero_pedido = NEW.numero_pedido
+		                  )
+     WHERE numero_pedido = NEW.numero_pedido;
+END$$
+
+CREATE TRIGGER trg_pedidos_produtos_au
+AFTER UPDATE ON pedidos_produtos
+FOR EACH ROW
+BEGIN
+    UPDATE pedidos_dados_gerais
+       SET valor_total = (SELECT COALESCE(SUM(valor_total), 0) 
+	                        FROM pedidos_produtos 
+	                       WHERE numero_pedido = NEW.numero_pedido
+                          )
+	 WHERE numero_pedido = NEW.numero_pedido;
+END$$
+
+CREATE TRIGGER trg_pedidos_produtos_ad
+AFTER DELETE ON pedidos_produtos
+FOR EACH ROW
+BEGIN
+    UPDATE pedidos_dados_gerais
+	   SET valor_total = (SELECT COALESCE(SUM(valor_total), 0) 
+                            FROM pedidos_produtos 
+						   WHERE numero_pedido = OLD.numero_pedido
+                          )
+     WHERE numero_pedido = OLD.numero_pedido;
+END$$
+
 DELIMITER ;
-
-
