@@ -26,6 +26,16 @@ type
     property Rollback: IDataManager read GetRollback;
   end;
 
+  TInsulationOptions = (ioUnspecified, ioDirtyRead, ioReadCommitted, ioRepeatableRead, ioSnapshot, ioSerializable);
+
+  ITransaction = interface
+  ['{0BC2E806-DB0F-492E-8A2B-E7605C94BD63}']
+    procedure StartTransaction();
+    procedure Commit();
+    procedure Rollback();
+    procedure SetOptions(Isolation: TInsulationOptions);
+  end;
+
   IMemory = interface
   ['{B7F3A945-ACDE-4EC2-9C47-BAD69B86D9E4}']
     function GetData(): TFDMemTable;
