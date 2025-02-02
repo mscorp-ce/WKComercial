@@ -6,11 +6,12 @@ uses
   FireDAC.Comp.Client, FireDAC.Stan.Option, uModel.Abstraction;
 
 type
-  TModelFireDACTransaction = class(TInterfacedObject, ITransaction)
+  TModelFireDACTransaction<T: TFDCustomConnection> = class(TInterfacedObject, ITransaction<TFDCustomConnection>)
   private
     FTransaction: TFDTransaction;
+    FConnection: T;
   public
-    constructor Create(Connection: TFDConnection); reintroduce;
+    constructor Create(Connection: T); reintroduce;
     destructor Destroy(); override;
 
     procedure StartTransaction();
@@ -26,37 +27,39 @@ implementation
 uses
   System.SysUtils;
 
-constructor TModelFireDACTransaction.Create(Connection: TFDConnection);
+constructor TModelFireDACTransaction<T>.Create(Connection: T);
 begin
   inherited Create();
 
+  FConnection := Connection;
   FTransaction := TFDTransaction.Create(nil);
-  FTransaction.Connection := Connection;
+  FTransaction.Connection := FConnection;
+  FTransaction.Options.Isolation := xiReadCommitted;
 end;
 
-destructor TModelFireDACTransaction.Destroy();
+destructor TModelFireDACTransaction<T>.Destroy();
 begin
   FreeAndNil(FTransaction);
 
   inherited Destroy();
 end;
 
-procedure TModelFireDACTransaction.StartTransaction();
+procedure TModelFireDACTransaction<T>.StartTransaction();
 begin
   FTransaction.StartTransaction;
 end;
 
-procedure TModelFireDACTransaction.Commit();
+procedure TModelFireDACTransaction<T>.Commit();
 begin
   FTransaction.Commit();
 end;
 
-procedure TModelFireDACTransaction.Rollback();
+procedure TModelFireDACTransaction<T>.Rollback();
 begin
    FTransaction.Rollback();
 end;
 
-procedure TModelFireDACTransaction.SetOptions(Isolation: TInsulationOptions);
+procedure TModelFireDACTransaction<T>.SetOptions(Isolation: TInsulationOptions);
 begin
   case Isolation of
     ioDirtyRead: FTransaction.Options.Isolation := xiDirtyRead;

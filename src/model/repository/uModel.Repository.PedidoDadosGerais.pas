@@ -7,12 +7,14 @@ uses
 
 type
   TPedidoDadosGeraisRepository = class(TInterfacedObject, IRepository<TPedidoDadosGerais>)
-  public
-    function Fields(): TStrings;
-    function FindAll(CommandSQL: String): TObjectList<TPedidoDadosGerais>; overload;
+  private
     procedure SetStatement(Statement: IStatement; Entity: TPedidoDadosGerais);
     procedure SetProperty(Statement: IStatement; Entity: TPedidoDadosGerais);
     procedure PopulateListEntitie(var List: TObjectList<TPedidoDadosGerais>; const Statement: IStatement);
+    function Find(): Integer;
+  public
+    function Fields(): TStrings;
+    function FindAll(CommandSQL: String): TObjectList<TPedidoDadosGerais>; overload;
     function Save(Entity: TPedidoDadosGerais): Boolean;
     function Update(Entity: TPedidoDadosGerais): Boolean;
     function DeleteById(Entity: TPedidoDadosGerais): Boolean;
@@ -23,16 +25,20 @@ type
 implementation
 
 uses
-  System.SysUtils, FireDAC.Stan.Error, FireDAC.Stan.Param, uModel.Repository.DataManager, uModel.Design.Factory.StatementFactory,
-  uModel.FireDACEngineException, uModel.ConstsStatement.PedidoDadosGerais, uModel.ConstsStatement.Repository.Commun;
+  System.SysUtils, FireDAC.Stan.Error, FireDAC.Stan.Param, FireDAC.Comp.Client, uModel.Repository.DataManager, uModel.Design.Factory.StatementFactory,
+  uModel.FireDACEngineException, uModel.ConstsStatement.PedidoDadosGerais, uModel.ConstsStatement.Repository.Commun,
+  uModel.FireDAC.Transaction;
 
 { TPedidoDadosGeraisRepository }
 
 function TPedidoDadosGeraisRepository.DeleteById(Entity: TPedidoDadosGerais): Boolean;
 begin
   var Statement: IStatement;
+  var Transaction: ITransaction<TFDCustomConnection>;
   try
     Statement:= TStatementFactory.GetStatement(DataManager);
+
+    Transaction := TModelFireDACTransaction<TFDCustomConnection>.Create(DataManager.Connection);
 
     Statement.Query.SQL.Clear();
     Statement.Query.SQL.Add(QUERY_DELETE_DADOS_GERAIS_BY_NUMERO_PEDIDO_NUMERO_PEDIDO);
@@ -112,6 +118,26 @@ begin
   end;
 end;
 
+function TPedidoDadosGeraisRepository.Find(): Integer;
+begin
+  var Statement: IStatement;
+  try
+    Statement:= TStatementFactory.GetStatement(DataManager);
+
+    Statement.Query.SQL.Clear();
+    Statement.Query.SQL.Add(QUERY_PEDIDO_DADOS_GERAIS_LAST_INSERT_ID);
+    Statement.Query.Open();
+
+    Result:= Statement.Query.FieldByName('numero_pedido').AsInteger;
+
+  except
+    on Error: EFDDBEngineException do
+      begin
+        raise Exception.Create(TFireDACEngineException.GetMessage(Error));
+      end;
+  end;
+end;
+
 function TPedidoDadosGeraisRepository.FindById(Id: Integer): TPedidoDadosGerais;
 begin
   var Statement: IStatement;
@@ -162,11 +188,11 @@ begin
     Statement.Query.SQL.Clear();
     Statement.Query.SQL.Add(QUERY_INSERT_PEDIDO_DADOS_GERAIS);
     SetStatement(Statement, Entity);
-    Statement.Query.Open();
+    Statement.Query.ExecSQL();
 
     var RowsAffected := Statement.Query.RowsAffected = ROWS_AFFECTED;
 
-    Entity.NumeroPedido := Statement.Query.FieldByName('numero_pedido').AsInteger;
+    Entity.NumeroPedido := Find();
 
     Result:= RowsAffected;
 
@@ -197,7 +223,6 @@ end;
 procedure TPedidoDadosGeraisRepository.SetStatement(Statement: IStatement; Entity: TPedidoDadosGerais);
 begin
   try
-    Statement.Query.Params.ParamByName('numero_pedido').AsInteger := Entity.NumeroPedido;
     Statement.Query.Params.ParamByName('data_emissao').AsDateTime := Entity.DataEmissao;
     Statement.Query.Params.ParamByName('codigo_cliente').AsInteger := Entity.Cliente.Codigo;
     Statement.Query.Params.ParamByName('valor_total').AsCurrency := Entity.ValorTotal;

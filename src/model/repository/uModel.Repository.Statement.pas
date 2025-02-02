@@ -10,7 +10,7 @@ type
   private
     FQuery: TFDQuery;
   public
-    constructor Create(DataManager: IDataManager);
+    constructor Create(DataManager: IDataManager<TFDConnection>);
     destructor Destroy; override;
 
     function GetQuery: TFDQuery;
@@ -26,13 +26,13 @@ uses
 
 { TStatement }
 
-constructor TStatement.Create(DataManager: IDataManager);
+constructor TStatement.Create(DataManager: IDataManager<TFDConnection>);
 begin
   inherited Create();
 
   FQuery:= TFDQuery.Create(nil);
 
-  FQuery.Connection:= TFDConnection(DataManager.Connection);
+  FQuery.Connection := DataManager.Connection;
 end;
 
 destructor TStatement.Destroy();

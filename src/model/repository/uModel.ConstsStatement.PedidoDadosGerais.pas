@@ -21,8 +21,10 @@ const
 
   QUERY_INSERT_PEDIDO_DADOS_GERAIS =
     'INSERT INTO pedidos_dados_gerais (data_emissao, codigo_cliente, valor_total) ' + sLineBreak +
-    'VALUES (:data_emissao, :codigo_cliente, :valor_total) '+ sLineBreak +
-    'SELECT LAST_INSERT_ID() AS numero_pedido; ';
+    'VALUES (:data_emissao, :codigo_cliente, :valor_total) ';
+
+  QUERY_PEDIDO_DADOS_GERAIS_LAST_INSERT_ID =
+    'SELECT LAST_INSERT_ID() AS numero_pedido ';
 
   QUERY_CLAUSE_WHERE_BY_NUMERO_PEDIDO = ' WHERE numero_pedido = :numero_pedido ';
 

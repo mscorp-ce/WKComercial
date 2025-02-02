@@ -9,7 +9,7 @@ uses
   FireDAC.Moni.RemoteClient, FireDAC.Moni.FlatFile, FireDAC.Moni.Base, FireDAC.Moni.Custom;
 
 type
-  TModelFireDAC = class(TInterfacedObject, IDataManager)
+  TModelFireDAC = class(TInterfacedObject, IDataManager<TFDConnection>)
     procedure onRecover(ASender, AInitiator: TObject;
       AException: Exception; var AAction: TFDPhysConnectionRecoverAction);
     procedure onOutput(ASender: TFDMoniClientLinkBase;
@@ -29,18 +29,18 @@ type
     constructor Create(); reintroduce;
     destructor Destroy(); override;
 
-    function GetStartTransaction(): IDataManager;
-    function GetCommit(): IDataManager;
-    function GetRollback(): IDataManager;
-    function GetEntity(EntitieName: String): IDataManager;
+    function GetStartTransaction(): IDataManager<TFDConnection>;
+    function GetCommit(): IDataManager<TFDConnection>;
+    function GetRollback(): IDataManager<TFDConnection>;
+    function GetEntity(EntitieName: String): IDataManager<TFDConnection>;
     function GetFieldNames(): TStrings;
 
-    function GetConnection(): TCustomConnection;
+    function GetConnection(): TFDConnection;
 
-    property Connection: TCustomConnection read GetConnection;
-    property StartTransaction: IDataManager read GetStartTransaction;
-    property Commit: IDataManager read GetCommit;
-    property Rollback: IDataManager read GetRollback;
+    property Connection: TFDConnection read GetConnection;
+    property StartTransaction: IDataManager<TFDConnection> read GetStartTransaction;
+    property Commit: IDataManager<TFDConnection> read GetCommit;
+    property Rollback: IDataManager<TFDConnection> read GetRollback;
   end;
 
 implementation
@@ -103,19 +103,19 @@ begin
   inherited Destroy();
 end;
 
-function TModelFireDAC.GetEntity(EntitieName: String): IDataManager;
+function TModelFireDAC.GetEntity(EntitieName: String): IDataManager<TFDConnection>;
 begin
   fEntitieName:= EntitieName;
   Result:= Self;
 end;
 
-function TModelFireDAC.GetCommit(): IDataManager;
+function TModelFireDAC.GetCommit(): IDataManager<TFDConnection>;
 begin
   FConnection.Commit();
   Result:= Self;
 end;
 
-function TModelFireDAC.GetConnection(): TCustomConnection;
+function TModelFireDAC.GetConnection(): TFDConnection;
 begin
   Result:= FConnection;
 end;
@@ -135,13 +135,13 @@ begin
   end;
 end;
 
-function TModelFireDAC.GetRollback(): IDataManager;
+function TModelFireDAC.GetRollback(): IDataManager<TFDConnection>;
 begin
   FConnection.Rollback();
   Result:= Self;
 end;
 
-function TModelFireDAC.GetStartTransaction(): IDataManager;
+function TModelFireDAC.GetStartTransaction(): IDataManager<TFDConnection>;
 begin
   FConnection.StartTransaction();
   Result:= Self;

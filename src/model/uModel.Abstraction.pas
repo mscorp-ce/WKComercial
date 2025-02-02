@@ -10,25 +10,25 @@ uses
 type
   TState = (dsBrowse, dsInsert, dsEdit, dsOpening);
 
-  IDataManager = interface
+  IDataManager<T: class> = interface
   ['{2D3401A0-6832-44CB-8FAB-22E9C37EC9D4}']
-    function GetConnection(): TCustomConnection;
-    function GetStartTransaction(): IDataManager;
-    function GetCommit(): IDataManager;
-    function GetRollback(): IDataManager;
-    function GetEntity(EntitName: String): IDataManager;
+    function GetConnection(): T;
+    function GetStartTransaction(): IDataManager<T>;
+    function GetCommit(): IDataManager<T>;
+    function GetRollback(): IDataManager<T>;
+    function GetEntity(EntitName: String): IDataManager<T>;
     function GetFieldNames(): TStrings;
 
-    property Connection: TCustomConnection read GetConnection;
+    property Connection: T read GetConnection;
 
-    property StartTransaction: IDataManager read GetStartTransaction;
-    property Commit: IDataManager read GetCommit;
-    property Rollback: IDataManager read GetRollback;
+    property StartTransaction: IDataManager<T> read GetStartTransaction;
+    property Commit: IDataManager<T> read GetCommit;
+    property Rollback: IDataManager<T> read GetRollback;
   end;
 
   TInsulationOptions = (ioUnspecified, ioDirtyRead, ioReadCommitted, ioRepeatableRead, ioSnapshot, ioSerializable);
 
-  ITransaction = interface
+  ITransaction<T: class> = interface
   ['{0BC2E806-DB0F-492E-8A2B-E7605C94BD63}']
     procedure StartTransaction();
     procedure Commit();
@@ -69,6 +69,7 @@ type
     function Save(Entity: T): Boolean;
     function Update(Entity: T): Boolean;
     function DeleteById(Entity: T): Boolean;
+    function Find(): Integer;
     function FindById(Id: Integer): T;
     function FindAll(): TObjectList<T>; overload;
   end;

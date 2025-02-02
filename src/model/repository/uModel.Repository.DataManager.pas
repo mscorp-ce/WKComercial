@@ -3,10 +3,10 @@ unit uModel.Repository.DataManager;
 interface
 
 uses
-  uModel.Abstraction;
+  uModel.Abstraction, FireDAC.Comp.Client;
 
 var
-  DataManager: IDataManager;
+  DataManager: IDataManager<TFDConnection>;
 
 implementation
 
