@@ -61,7 +61,8 @@ type
   IRootPersistence<T: class> = interface
   ['{D9047AE9-B05C-4B37-8AEE-9A6B9A5772EB}']
     function Fields(): TStrings;
-    function FindAll(CommadSQL: String): TObjectList<T>;
+    function CommandSQL(): String;
+    function FindAll(): TObjectList<T>;
   end;
 
   IPersistence<T: class> = interface(IRootPersistence<T>)
@@ -71,7 +72,7 @@ type
     function DeleteById(Entity: T): Boolean;
     function Find(): Integer;
     function FindById(Id: Integer): T;
-    function FindAll(): TObjectList<T>; overload;
+    function FindAll(CommandSQL: String): TObjectList<T>; overload;
   end;
 
   IRootController<T: class> = interface(IRootPersistence<T>)

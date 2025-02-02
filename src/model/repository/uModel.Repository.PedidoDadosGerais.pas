@@ -19,6 +19,7 @@ type
     function Update(Entity: TPedidoDadosGerais): Boolean;
     function DeleteById(Entity: TPedidoDadosGerais): Boolean;
     function FindById(Id: Integer): TPedidoDadosGerais;
+    function CommandSQL(): String;
     function FindAll(): TObjectList<TPedidoDadosGerais>; overload;
   end;
 
@@ -30,6 +31,11 @@ uses
   uModel.FireDAC.Transaction;
 
 { TPedidoDadosGeraisRepository }
+
+function TPedidoDadosGeraisRepository.CommandSQL(): String;
+begin
+  Result := QUERY_PEDIDO_DADOS_GERAIS;
+end;
 
 function TPedidoDadosGeraisRepository.DeleteById(Entity: TPedidoDadosGerais): Boolean;
 begin
