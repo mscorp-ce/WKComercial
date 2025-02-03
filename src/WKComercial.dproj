@@ -183,6 +183,10 @@
         <DCCReference Include="model\repository\uModel.ConstsStatement.Produtos.pas"/>
         <DCCReference Include="view\data\definition\uView.Data.Definition.Produto.pas"/>
         <DCCReference Include="view\uView.DataConverter.Produto.pas"/>
+        <DCCReference Include="model\services\exception\uModel.uModel.Services.Exception.EFireDACPedidoProdutoBusinessException.pas"/>
+        <DCCReference Include="model\services\uModel.Services.PedidoProduto.pas"/>
+        <DCCReference Include="controller\uController.PedidoProduto.pas"/>
+        <DCCReference Include="controller\uController.Produto.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
