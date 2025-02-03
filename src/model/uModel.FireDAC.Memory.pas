@@ -147,6 +147,10 @@ end;
 procedure TModelFireDACMemory.SetState(const Value: TState);
 begin
   FState := Value;
+
+  case FState of
+    dsEdit: FData.Edit();
+  end;
 end;
 
 end.
