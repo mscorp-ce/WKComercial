@@ -74,9 +74,9 @@ begin
   Result := ProdutoRepository.FindAll(CommandSQL);
 end;
 
-function TProdutoService.Find: Integer;
+function TProdutoService.Find(): Integer;
 begin
-  Result := 0;
+  Result := ProdutoRepository.Find();
 end;
 
 function TProdutoService.FindById(Id: Integer): TProduto;
