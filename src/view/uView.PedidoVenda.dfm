@@ -340,6 +340,7 @@ object frmPedidoVenda: TfrmPedidoVenda
       ImageIndex = 1
       Images = ImgLista
       TabOrder = 6
+      OnClick = btnInserirClick
     end
     object edtCodProduto: TEdit
       Left = 5
@@ -347,26 +348,35 @@ object frmPedidoVenda: TfrmPedidoVenda
       Width = 100
       Height = 23
       TabOrder = 0
+      OnChange = edtCodProdutoChange
+      OnKeyPress = edtCodProdutoKeyPress
     end
     object edtQuantidade: TEdit
       Left = 459
       Top = 48
       Width = 100
       Height = 23
+      Alignment = taRightJustify
       TabOrder = 3
+      OnChange = edtQuantidadeChange
+      OnKeyPress = edtQuantidadeKeyPress
     end
-    object edtValorUnit: TEdit
+    object edtValorUnitatio: TEdit
       Left = 565
       Top = 48
       Width = 100
       Height = 23
+      Alignment = taRightJustify
       TabOrder = 4
+      OnChange = edtValorUnitatioChange
+      OnKeyPress = edtValorUnitatioKeyPress
     end
     object edtTotal: TEdit
       Left = 670
       Top = 48
       Width = 100
       Height = 23
+      Alignment = taRightJustify
       ReadOnly = True
       TabOrder = 5
     end
