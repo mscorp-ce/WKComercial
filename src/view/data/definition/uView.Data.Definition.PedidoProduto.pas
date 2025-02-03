@@ -19,14 +19,13 @@ class function TDataDefinitionPedidoProduto.JSON(): String;
 begin
   Result := '{' +
              '"fields": [' +
-             '  { "name": "data_emissao", "type": "ftDate" },' +
              '  { "name": "numero_pedido", "type": "ftInteger" },' +
              '  { "name": "autoincrem", "type": "ftInteger" },' +
              '  { "name": "codigo_produto", "type": "ftInteger" },' +
              '  { "name": "nome_produto", "type": "ftWideString", "length": 255 },' +
              '  { "name": "quantidade", "type": "ftCurrency", "displayFormat": "#,##0.00" },' +
-             '  { "name": "valor_unitario", "type": "ftCurrency", "displayFormat": "#,##0.00" },' +
-             '  { "name": "valor_total", "type": "ftCurrency", "displayFormat": "#,##0.00" }' +
+             '  { "name": "valor_unitario", "type": "ftCurrency", "displayFormat": "R$ #,##0.00" },' +
+             '  { "name": "valor_total", "type": "ftCurrency", "displayFormat": "R$ #,##0.00" }' +
              ']' +
              '}';
 end;
