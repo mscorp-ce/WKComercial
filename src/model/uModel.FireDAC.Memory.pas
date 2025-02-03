@@ -12,11 +12,14 @@ type
   private
     FData: TFDMemTable;
     FRecNo: Integer;
+    FState: TState;
     procedure AddFields(const StructureData: String);
     procedure AddDisplayFormat(const Fields: TJSONArray);
     function GetData(): TFDMemTable;
     procedure SetRecNo(const Value: Integer);
     function GetRecNo: Integer;
+    procedure SetState(const Value: TState);
+    function GetState: TState;
   public
     constructor Create(const StructureData: String);
     destructor Destroy(); override;
@@ -25,6 +28,7 @@ type
 
     property Data: TFDMemTable read GetData;
     property RecNo: Integer read GetRecNo write SetRecNo;
+    property State: TState read GetState write SetState;
   end;
 
 const
@@ -95,6 +99,8 @@ begin
 
   FData := TFDMemTable.Create(nil);
 
+  FState := dsBrowse;
+
   AddFields(StructureData);
 end;
 
@@ -116,9 +122,16 @@ begin
   Result := FRecNo;
 end;
 
+function TModelFireDACMemory.GetState: TState;
+begin
+  Result := FState;
+end;
+
 procedure TModelFireDACMemory.Open();
 begin
   FData.Open();
+
+  State := dsOpening;
 
   if FRecNo > IS_EMPTY_RECORDS then
     FData.RecNo := FRecNo
@@ -129,6 +142,11 @@ end;
 procedure TModelFireDACMemory.SetRecNo(const Value: Integer);
 begin
   FRecNo := Value;
+end;
+
+procedure TModelFireDACMemory.SetState(const Value: TState);
+begin
+  FState := Value;
 end;
 
 end.

@@ -43,10 +43,14 @@ type
     procedure SetRecNo(const Value: Integer);
     function GetRecNo: Integer;
 
+    procedure SetState(const Value: TState);
+    function GetState: TState;
+
     procedure Open();
 
     property Data: TFDMemTable read GetData;
     property RecNo: Integer read GetRecNo write SetRecNo;
+    property State: TState read GetState write SetState;
   end;
 
   IStatement = interface
@@ -81,6 +85,7 @@ type
 
   IController<T: class> = interface(IPersistence<T>)
   ['{0C7B72B1-76BA-4463-BA7F-FAC7A90470EC}']
+    function IsValid(Entity: T; out MessageContext: String): Boolean;
   end;
 
   IService<T: class> = interface(IPersistence<T>)
