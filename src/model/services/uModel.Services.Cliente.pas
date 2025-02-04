@@ -31,7 +31,7 @@ implementation
 { TClienteService }
 
 uses
-  System.SysUtils, uModel.Repository.Cliente, Vcl.Dialogs;
+  System.SysUtils, uModel.Repository.Cliente, uModel.uModel.Services.Exception.EServiceClienteBusinessException;
 
 function TClienteService.CommandSQL(): string;
 begin
@@ -101,22 +101,26 @@ function TClienteService.Save(Entity: TCliente): Boolean;
 var
   MessageContext: String;
 begin
-  Result := False;
+  if not IsValid(Entity, MessageContext) then
+    raise EServiceClienteBusinessException.Create(MessageContext);
 
-  if IsValid(Entity, MessageContext) then
-    Result := ClienteRepository.Save(Entity)
-  else ShowMessage(MessageContext);
+  Result := ClienteRepository.Save(Entity);
+
+  if not Result then
+    raise EServiceClienteBusinessException.Create('Erro ao tentar salvar o cliente.');
 end;
 
 function TClienteService.Update(Entity: TCliente): Boolean;
 var
   MessageContext: String;
 begin
-  Result := False;
+  if not IsValid(Entity, MessageContext) then
+    raise EServiceClienteBusinessException.Create(MessageContext);
 
-  if IsValid(Entity, MessageContext) then
-    Result := ClienteRepository.Update(Entity)
-  else ShowMessage(MessageContext);
+  Result := ClienteRepository.Update(Entity);
+
+  if not Result then
+    raise EServiceClienteBusinessException.Create('Erro ao tentar alterar um cliente.');
 end;
 
 end.
