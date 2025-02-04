@@ -33,7 +33,6 @@ object frmPedidoVenda: TfrmPedidoVenda
     Align = alTop
     Caption = '[ Pedido ] '
     TabOrder = 0
-    ExplicitWidth = 967
     object lblCliente: TLabel
       Left = 230
       Top = 26
@@ -89,6 +88,8 @@ object frmPedidoVenda: TfrmPedidoVenda
       Width = 100
       Height = 23
       TabOrder = 2
+      OnChange = edtClienteChange
+      OnKeyPress = edtClienteKeyPress
     end
     object edtClienteDesc: TEdit
       Left = 358
@@ -391,6 +392,7 @@ object frmPedidoVenda: TfrmPedidoVenda
       ImageIndex = 3
       Images = ImgLista
       TabOrder = 7
+      OnClick = btnGravarPedidoClick
     end
     object btnProdutos: TButton
       Left = 108

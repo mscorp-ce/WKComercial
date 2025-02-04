@@ -5,8 +5,8 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms,
   Vcl.Dialogs, Vcl.StdCtrls, Data.DB, Vcl.Grids, Vcl.DBGrids, Vcl.Buttons, Vcl.ComCtrls, System.ImageList, Vcl.ImgList,
-  uModel.Abstraction, Vcl.WinXCalendars, uModel.Entities.PedidoProduto,
-  uModel.Entities.PedidoDadosGerais, uModel.Entities.Produto;
+  uModel.Abstraction, Vcl.WinXCalendars, uModel.Entities.PedidoProduto, uModel.Entities.PedidoDadosGerais, uModel.Entities.Produto,
+  uModel.Entities.Cliente;
 
 type
   TfrmPedidoVenda = class(TForm)
@@ -51,25 +51,37 @@ type
     procedure edtCodProdutoChange(Sender: TObject);
     procedure grdItensKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure grdItensKeyPress(Sender: TObject; var Key: Char);
+    procedure btnGravarPedidoClick(Sender: TObject);
+    procedure edtClienteChange(Sender: TObject);
+    procedure edtClienteKeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }
     Memory: IMemory;
 
     PedidoProdutoController: IController<TPedidoProduto>;
     ProdutoController: IController<TProduto>;
+    ClienteController: IController<TCliente>;
     PedidoDadosGerais: TPedidoDadosGerais;
+    ControllerPedidoDadosGerais: IController<TPedidoDadosGerais>;
     PedidoProduto: TPedidoProduto;
 
     procedure ConsultarClientes();
     procedure ConsultarProdutos();
+    procedure SetPedidoDadosGerais();
     procedure SetPedidoProduto();
-    procedure SetRegistros();
+    procedure SetRegistrosItens();
     procedure CalcularTotal();
     procedure CalcularValorTotal(const Quantidade, ValorUnit: String);
-    procedure ExecuteKeyPress(Sender: TObject; var Key: Char);
     procedure InserirProdutos();
     procedure EditarProdutos();
     procedure LimparCampos();
+    procedure ExecuteKeyPress(Sender: TObject; var Key: Char);
+    procedure ExecuteNumericoKeyPress(Sender: TObject; var Key: Char);
+    procedure ExecuteCancelarLetrasKeyPress(Sender: TObject; var Key: Char);
+    procedure ExecuteTrocarPontoPorVirguaKeyPress(Sender: TObject; var Key: Char);
+    procedure ExecuteCancelarTrocarPontoOuVirguaKeyPress(Sender: TObject; var Key: Char);
+
+    procedure GravarPedido();
   protected
     { Protected declarations }
     procedure DoShow(); override;
@@ -85,7 +97,8 @@ implementation
 
 uses
   uModel.FireDAC.Memory, uView.Data.Definition.PedidoProduto, uView.FormCliente.Consulta, uView.FormProduto.Consulta,
-  uController.PedidoProduto, uController.Produto;
+  uController.PedidoProduto, uController.Produto, uController.Cliente, uController.PedidoDadosGerais, uModel.FireDAC.CustomConnection,
+  uModel.Repository.DataManager, uModel.FireDAC.Transaction;
 
 {$R *.dfm}
 
@@ -94,6 +107,49 @@ uses
 procedure TfrmPedidoVenda.btnClientesClick(Sender: TObject);
 begin
   ConsultarClientes();
+end;
+
+procedure TfrmPedidoVenda.GravarPedido();
+begin
+  try
+    SetPedidoDadosGerais();
+
+    var Transaction: ITransaction<TModelFireDACCustomConnection>;
+
+    Transaction := TModelFireDACTransaction<TModelFireDACCustomConnection>.Create(DataManager.Connection);
+
+    Transaction.SetOptions(ioRepeatableRead);
+
+    Transaction.StartTransaction();
+    try
+      if PedidoDadosGerais.NumeroPedido = 0 then
+        begin
+          ControllerPedidoDadosGerais.Save(PedidoDadosGerais);
+        end
+      else
+        begin
+          ControllerPedidoDadosGerais.Update(PedidoDadosGerais);
+        end;
+
+      Transaction.Commit();
+
+      edtNumeroPedido.Text := PedidoDadosGerais.NumeroPedido.ToString();
+       except
+      on E: Exception do
+        begin
+          Transaction.Rollback();
+        end;
+    end;
+
+ except
+    on E: Exception do
+      ShowMessage(E.Message);
+  end;
+end;
+
+procedure TfrmPedidoVenda.btnGravarPedidoClick(Sender: TObject);
+begin
+  GravarPedido();
 end;
 
 procedure TfrmPedidoVenda.btnInserirClick(Sender: TObject);
@@ -175,6 +231,9 @@ begin
   PedidoDadosGerais := TPedidoDadosGerais.Create();
   PedidoProduto := TPedidoProduto.Create();
   ProdutoController := TControllerProduto.Create();
+  ClienteController:= TControllerCliente.Create();
+
+  ControllerPedidoDadosGerais := TControllerPedidoDadosGerais.Create(Memory);
 
   PedidoProdutoController := TControllerPedidoProduto.Create();
 
@@ -214,16 +273,42 @@ begin
   edtTotal.Text:= FloatToStr(StrToFloatDef(Quantidade, 0) * StrToFloatDef(ValorUnit, 0));
 end;
 
-procedure TfrmPedidoVenda.ExecuteKeyPress(Sender: TObject; var Key: Char);
+procedure TfrmPedidoVenda.ExecuteCancelarLetrasKeyPress(Sender: TObject; var Key: Char);
 begin
-  if not (CharInSet(Key, ['0'..'9', #8, #13, ',', '.'])) then
+  if not (CharInSet(Key, ['0'..'9', #8, #13])) then
     Key := #0;
+end;
 
+procedure TfrmPedidoVenda.ExecuteTrocarPontoPorVirguaKeyPress(Sender: TObject; var Key: Char);
+begin
   if (CharInSet(Key, ['.'])) then
     Key := ',';
 
-  if (CharInSet(Key, [',', '.'])) and (Pos(Key, (Sender as TEdit).Text) > 0) then
+  if (Key = ',') and (Pos(',', (Sender as TEdit).Text) > 0) then
     Key := #0;
+end;
+
+procedure TfrmPedidoVenda.ExecuteCancelarTrocarPontoOuVirguaKeyPress(Sender: TObject; var Key: Char);
+begin
+  if (CharInSet(Key, ['.', ','])) then
+    Key := #0;
+end;
+
+procedure TfrmPedidoVenda.ExecuteKeyPress(Sender: TObject; var Key: Char);
+begin
+  ExecuteCancelarLetrasKeyPress(Sender, Key);
+
+  ExecuteCancelarTrocarPontoOuVirguaKeyPress(Sender, Key);
+end;
+
+procedure TfrmPedidoVenda.ExecuteNumericoKeyPress(Sender: TObject; var Key: Char);
+begin
+  ExecuteTrocarPontoPorVirguaKeyPress(Sender, Key);
+
+  if Key = ',' then
+    Exit();
+
+  ExecuteCancelarLetrasKeyPress(Sender, Key);
 end;
 
 procedure TfrmPedidoVenda.grdItensKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -246,7 +331,7 @@ const
   ENTER = #13;
 begin
   if key  = ENTER then
-    SetRegistros();
+    SetRegistrosItens();
 end;
 
 procedure TfrmPedidoVenda.InserirProdutos();
@@ -284,10 +369,25 @@ end;
 
 procedure TfrmPedidoVenda.edtQuantidadeKeyPress(Sender: TObject; var Key: Char);
 begin
-  ExecuteKeyPress(Sender, Key);
+  ExecuteNumericoKeyPress(Sender, Key);
 end;
 
 procedure TfrmPedidoVenda.edtValorUnitatioKeyPress(Sender: TObject; var Key: Char);
+begin
+  ExecuteNumericoKeyPress(Sender, Key);
+end;
+
+procedure TfrmPedidoVenda.edtClienteChange(Sender: TObject);
+begin
+  var Cliente := ClienteController.FindById(StrToIntDef(edtCliente.Text, 0));
+  try
+    edtClienteDesc.Text := Cliente.Nome;
+  finally
+    FreeAndNil(Cliente);
+  end;
+end;
+
+procedure TfrmPedidoVenda.edtClienteKeyPress(Sender: TObject; var Key: Char);
 begin
   ExecuteKeyPress(Sender, Key);
 end;
@@ -305,9 +405,6 @@ end;
 procedure TfrmPedidoVenda.edtCodProdutoKeyPress(Sender: TObject; var Key: Char);
 begin
   ExecuteKeyPress(Sender, Key);
-
-  if (CharInSet(Key, [#13, ',', '.'])) then
-    Key := #0;
 end;
 
 procedure TfrmPedidoVenda.edtQuantidadeChange(Sender: TObject);
@@ -329,7 +426,13 @@ begin
   PedidoProduto.ValorTotal := StrToFloatDef(edtTotal.Text, 0);
 end;
 
-procedure TfrmPedidoVenda.SetRegistros();
+procedure TfrmPedidoVenda.SetPedidoDadosGerais();
+begin
+  PedidoDadosGerais.DataEmissao := capStartDate.Date;
+  PedidoDadosGerais.Cliente.Codigo := StrToIntDef(edtCliente.Text, 0);
+end;
+
+procedure TfrmPedidoVenda.SetRegistrosItens();
 begin
   Memory.State := dsEdit;
   edtCodProduto.Text:= Memory.Data.FieldByName('codigo_produto').AsString;
