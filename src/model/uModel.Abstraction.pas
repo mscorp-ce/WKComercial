@@ -90,7 +90,8 @@ type
 
   IService<T: class> = interface(IPersistence<T>)
   ['{5E47E4E7-D251-4AD9-BA5E-00B5DBAAD58C}']
-    function IsValid(Entity: T; out MessageContext: String): Boolean;
+    function IsValid(Entity: T; out MessageContext: String): Boolean; overload;
+    function IsValid(Entity: T; const Memory: IMemory): Boolean; overload;
   end;
 
   IRepository<T: class> = interface(IPersistence<T>)
