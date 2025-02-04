@@ -8,7 +8,7 @@ uses
 type
   TControllerPedidoProduto = class(TInterfacedObject, IController<TPedidoProduto>)
   private
-    PedidoProdutoService: IDominio<TPedidoProduto>;
+    PedidoProdutoService: IDomain<TPedidoProduto>;
 
   public
     function Fields(): TStrings;

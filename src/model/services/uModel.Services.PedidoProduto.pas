@@ -7,7 +7,7 @@ uses
   Data.DB, uModel.Entities.Produto;
 
 type
-  TPedidoProdutoService = class(TInterfacedObject, IDominio<TPedidoProduto>)
+  TPedidoProdutoService = class(TInterfacedObject, IDomain<TPedidoProduto>)
   private
     PedidoProdutoRepository: IRepository<TPedidoProduto>;
     ProdutoRepository: IRepository<TProduto>;

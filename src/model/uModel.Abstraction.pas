@@ -93,7 +93,7 @@ type
     function IsValid(Entity: T; out MessageContext: String): Boolean; overload;
   end;
 
-  IDominio<T: class> = interface(IService<T>)
+  IDomain<T: class> = interface(IService<T>)
   ['{1986F161-6CD0-482D-ACF9-43EF9F6DB6AC}']
     function IsValid(Entity: T; const Memory: IMemory): Boolean; overload;
   end;
