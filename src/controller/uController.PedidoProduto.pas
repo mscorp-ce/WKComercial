@@ -9,7 +9,6 @@ type
   TControllerPedidoProduto = class(TInterfacedObject, IController<TPedidoProduto>)
   private
     PedidoProdutoService: IDomain<TPedidoProduto>;
-
   public
     function Fields(): TStrings;
     function CommandSQL(): String;
