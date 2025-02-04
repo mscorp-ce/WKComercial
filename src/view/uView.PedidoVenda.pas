@@ -49,6 +49,8 @@ type
     procedure edtValorUnitatioChange(Sender: TObject);
     procedure edtCodProdutoKeyPress(Sender: TObject; var Key: Char);
     procedure edtCodProdutoChange(Sender: TObject);
+    procedure grdItensKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure grdItensKeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }
     Memory: IMemory;
@@ -61,8 +63,13 @@ type
     procedure ConsultarClientes();
     procedure ConsultarProdutos();
     procedure SetPedidoProduto();
-    procedure CalcularTotal(const Quantidade, ValorUnit: String);
+    procedure SetRegistros();
+    procedure CalcularTotal();
+    procedure CalcularValorTotal(const Quantidade, ValorUnit: String);
     procedure ExecuteKeyPress(Sender: TObject; var Key: Char);
+    procedure InserirProdutos();
+    procedure EditarProdutos();
+    procedure LimparCampos();
   protected
     { Protected declarations }
     procedure DoShow(); override;
@@ -101,7 +108,16 @@ begin
   var MessageContext: String;
 
   try
-    PedidoProdutoController.IsValid(PedidoProduto, MessageContext);
+    if PedidoProdutoController.IsValid(PedidoProduto, MessageContext) and (Memory.State in[dsOpening, dsInsert]) then // Data.IsEmpty() then
+      begin
+        InserirProdutos();
+        LimparCampos();
+        edtCodProduto.SetFocus();
+        Memory.Data.Open();
+        CalcularTotal();
+      end
+  else EditarProdutos();
+
 
     MessageContext:= '';
   except
@@ -154,6 +170,8 @@ begin
   inherited;
   Memory := TModelFireDACMemory.Create(TDataDefinitionPedidoProduto.JSON());
 
+  dsPedido.DataSet := Memory.Data;
+
   PedidoDadosGerais := TPedidoDadosGerais.Create();
   PedidoProduto := TPedidoProduto.Create();
   ProdutoController := TControllerProduto.Create();
@@ -171,7 +189,27 @@ begin
   edtCliente.SetFocus();
 end;
 
-procedure TfrmPedidoVenda.CalcularTotal(const Quantidade, ValorUnit: String);
+procedure TfrmPedidoVenda.CalcularTotal();
+begin
+  Memory.Data.DisableControls();
+
+  var Total: Currency;
+  Total := 0.00;
+
+  Memory.Data.First();
+
+  while not Memory.Data.Eof do
+    begin
+      Total:= Total + Memory.Data.FieldByName('valor_total').AsCurrency;
+      Memory.Data.Next();
+    end;
+
+  stbRodape.Panels[0].Text:= 'Total do pedido: '+ FormatFloat('R$ 0.00', Total);
+
+  Memory.Data.EnableControls();
+end;
+
+procedure TfrmPedidoVenda.CalcularValorTotal(const Quantidade, ValorUnit: String);
 begin
   edtTotal.Text:= FloatToStr(StrToFloatDef(Quantidade, 0) * StrToFloatDef(ValorUnit, 0));
 end;
@@ -186,6 +224,62 @@ begin
 
   if (CharInSet(Key, [',', '.'])) and (Pos(Key, (Sender as TEdit).Text) > 0) then
     Key := #0;
+end;
+
+procedure TfrmPedidoVenda.grdItensKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if (Shift = [ssCtrl]) and (Key = VK_DELETE) then
+    Key := 0;
+
+  if key = VK_DELETE then
+    begin
+      if MessageBox(Application.Handle, Pchar ('Deseja realmente deseja excluir o produto?'), 'Exclusão de produtos', MB_YESNO) = idYes then
+        begin
+          Memory.Data.Delete();
+          CalcularTotal();
+        end;
+    end;
+end;
+
+procedure TfrmPedidoVenda.grdItensKeyPress(Sender: TObject; var Key: Char);
+const
+  ENTER = #13;
+begin
+  if key  = ENTER then
+    SetRegistros();
+end;
+
+procedure TfrmPedidoVenda.InserirProdutos();
+begin
+  Memory.Data.Append();
+  Memory.Data.FieldByName('codigo_produto').AsInteger := PedidoProduto.Produto.Codigo;
+  Memory.Data.FieldByName('nome_produto').AsString := PedidoProduto.Produto.Descricao;
+  Memory.Data.FieldByName('quantidade').AsCurrency := PedidoProduto.Quantidade;
+  Memory.Data.FieldByName('valor_unitario').AsCurrency := PedidoProduto.ValorUnitario;
+  Memory.Data.FieldByName('valor_total').AsCurrency := PedidoProduto.ValorTotal;
+  Memory.Data.Post();
+end;
+
+procedure TfrmPedidoVenda.EditarProdutos();
+begin
+  Memory.Data.FieldByName('codigo_produto').AsInteger := StrToIntDef(edtCodProduto.Text, 0);
+  Memory.Data.FieldByName('nome_produto').AsString := edtDescricao.Text;
+  Memory.Data.FieldByName('quantidade').AsCurrency := StrToFloatDef(edtQuantidade.Text, 0);
+  Memory.Data.FieldByName('valor_unitario').AsCurrency := StrToFloatDef(edtValorUnitatio.Text, 0 );
+  Memory.Data.FieldByName('valor_total').AsCurrency := StrToFloatDef(edtTotal.Text, 0);
+
+  Memory.Data.Post();
+  CalcularTotal();
+  LimparCampos();
+end;
+
+procedure TfrmPedidoVenda.LimparCampos();
+begin
+  edtCodProduto.Text := '';
+  edtDescricao.Text := '';
+  edtQuantidade.Text := '';
+  edtValorUnitatio.Text := '';
+  edtTotal.Text := '';
 end;
 
 procedure TfrmPedidoVenda.edtQuantidadeKeyPress(Sender: TObject; var Key: Char);
@@ -218,20 +312,33 @@ end;
 
 procedure TfrmPedidoVenda.edtQuantidadeChange(Sender: TObject);
 begin
-  CalcularTotal(edtQuantidade.Text, edtValorUnitatio.Text);
+  CalcularValorTotal(edtQuantidade.Text, edtValorUnitatio.Text);
 end;
 
 procedure TfrmPedidoVenda.edtValorUnitatioChange(Sender: TObject);
 begin
-  CalcularTotal(edtQuantidade.Text, edtValorUnitatio.Text);
+  CalcularValorTotal(edtQuantidade.Text, edtValorUnitatio.Text);
 end;
 
 procedure TfrmPedidoVenda.SetPedidoProduto();
 begin
   PedidoProduto.Produto.Codigo := StrToIntDef(edtCodProduto.Text, 0);
+  PedidoProduto.Produto.Descricao := edtDescricao.Text;
   PedidoProduto.Quantidade :=  StrToFloatDef(edtQuantidade.Text, 0);
   PedidoProduto.ValorUnitario := StrToFloatDef(edtValorUnitatio.Text, 0);
   PedidoProduto.ValorTotal := StrToFloatDef(edtTotal.Text, 0);
+end;
+
+procedure TfrmPedidoVenda.SetRegistros();
+begin
+  Memory.State := dsEdit;
+  edtCodProduto.Text:= Memory.Data.FieldByName('codigo_produto').AsString;
+  edtDescricao.Text := Memory.Data.FieldByName('nome_produto').AsString;
+  edtQuantidade.Text:= FloatToStr(Memory.Data.FieldByName('quantidade').AsCurrency);
+  edtValorUnitatio.Text := FloatToStr( Memory.Data.FieldByName('valor_unitario').AsCurrency);
+  edtTotal.Text     := FloatToStr( Memory.Data.FieldByName('valor_total').AsCurrency);
+  edtCodProduto.ReadOnly:= True;
+  edtQuantidade.SetFocus;
 end;
 
 procedure TfrmPedidoVenda.stbRodapeDrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel; const Rect: TRect);

@@ -13,7 +13,7 @@ object frmPedidoVenda: TfrmPedidoVenda
   Position = poScreenCenter
   TextHeight = 15
   object stbRodape: TStatusBar
-    Left = 696
+    Left = 607
     Top = 425
     Width = 285
     Height = 28
@@ -161,18 +161,22 @@ object frmPedidoVenda: TfrmPedidoVenda
     DataSource = dsPedido
     DrawingStyle = gdsGradient
     GradientEndColor = clBlack
+    Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
     TabOrder = 3
     TitleFont.Charset = DEFAULT_CHARSET
     TitleFont.Color = clWindowText
     TitleFont.Height = -12
     TitleFont.Name = 'Segoe UI'
     TitleFont.Style = []
+    OnKeyDown = grdItensKeyDown
+    OnKeyPress = grdItensKeyPress
     Columns = <
       item
         Alignment = taCenter
         Expanded = False
-        FieldName = 'Item'
+        FieldName = 'autoincrem'
         Title.Alignment = taCenter
+        Title.Caption = 'C'#243'digo'
         Title.Font.Charset = DEFAULT_CHARSET
         Title.Font.Color = clWhite
         Title.Font.Height = -12
@@ -183,20 +187,9 @@ object frmPedidoVenda: TfrmPedidoVenda
       item
         Alignment = taCenter
         Expanded = False
-        FieldName = 'Codigo'
+        FieldName = 'codigo_produto'
         Title.Alignment = taCenter
-        Title.Font.Charset = DEFAULT_CHARSET
-        Title.Font.Color = clWhite
-        Title.Font.Height = -12
-        Title.Font.Name = 'Segoe UI'
-        Title.Font.Style = [fsBold]
-        Visible = True
-      end
-      item
-        Alignment = taCenter
-        Expanded = False
-        FieldName = 'Produto'
-        Title.Alignment = taCenter
+        Title.Caption = 'Produto'
         Title.Font.Charset = DEFAULT_CHARSET
         Title.Font.Color = clWhite
         Title.Font.Height = -12
@@ -206,7 +199,7 @@ object frmPedidoVenda: TfrmPedidoVenda
       end
       item
         Expanded = False
-        FieldName = 'Descricao'
+        FieldName = 'nome_produto'
         Title.Caption = 'Descri'#231#227'o'
         Title.Font.Charset = DEFAULT_CHARSET
         Title.Font.Color = clWhite
@@ -219,8 +212,9 @@ object frmPedidoVenda: TfrmPedidoVenda
       item
         Alignment = taRightJustify
         Expanded = False
-        FieldName = 'Quantidade'
+        FieldName = 'quantidade'
         Title.Alignment = taRightJustify
+        Title.Caption = 'Quantidade'
         Title.Font.Charset = DEFAULT_CHARSET
         Title.Font.Color = clWhite
         Title.Font.Height = -12
@@ -232,7 +226,7 @@ object frmPedidoVenda: TfrmPedidoVenda
       item
         Alignment = taRightJustify
         Expanded = False
-        FieldName = 'ValorUnitario'
+        FieldName = 'valor_unitario'
         Title.Alignment = taRightJustify
         Title.Caption = 'Valor Unit'#225'rio'
         Title.Font.Charset = DEFAULT_CHARSET
@@ -246,8 +240,9 @@ object frmPedidoVenda: TfrmPedidoVenda
       item
         Alignment = taRightJustify
         Expanded = False
-        FieldName = 'Total'
+        FieldName = 'valor_total'
         Title.Alignment = taRightJustify
+        Title.Caption = 'Total'
         Title.Font.Charset = DEFAULT_CHARSET
         Title.Font.Color = clWhite
         Title.Font.Height = -12
@@ -265,7 +260,6 @@ object frmPedidoVenda: TfrmPedidoVenda
     Align = alTop
     Caption = '[ Produtos ] '
     TabOrder = 1
-    ExplicitWidth = 967
     object lblCodProduto: TLabel
       Left = 5
       Top = 29
