@@ -33,7 +33,7 @@ implementation
 
 uses
   System.SysUtils, uModel.Repository.PedidoProduto, Vcl.Dialogs,
-  uModel.uModel.Services.Exception.EFireDACPedidoProdutoBusinessException,
+  uModel.uModel.Services.Exception.EServicePedidoProdutoBusinessException,
   uModel.Repository.Produto;
 
 function TPedidoProdutoService.CommandSQL(): string;
@@ -95,7 +95,7 @@ begin
   if Entity.Produto.Codigo = 0 then
     begin
       MessageContext:= 'Informe um produto válido.';
-      raise EFireDACPedidoProdutoBusinessException.Create(MessageContext);
+      raise EServicePedidoProdutoBusinessException.Create(MessageContext);
     end;
 
   Produto := ProdutoRepository.FindById(Entity.Produto.Codigo);
@@ -103,31 +103,31 @@ begin
     if not Assigned(Produto) then
       begin
         MessageContext:= 'Informe um produto válido.';
-        raise EFireDACPedidoProdutoBusinessException.Create(MessageContext);
+        raise EServicePedidoProdutoBusinessException.Create(MessageContext);
       end;
 
     if Produto.Codigo = 0 then
       begin
         MessageContext:= 'Informe um produto válido.';
-        raise EFireDACPedidoProdutoBusinessException.Create(MessageContext);
+        raise EServicePedidoProdutoBusinessException.Create(MessageContext);
       end;
 
     if Entity.Quantidade <= 0.01 then
       begin
         MessageContext:= 'Informe uma quantidade maior do que zero.';
-        raise EFireDACPedidoProdutoBusinessException.Create(MessageContext);
+        raise EServicePedidoProdutoBusinessException.Create(MessageContext);
       end;
 
     if Entity.ValorUnitario < Produto.PrecoVenda then
       begin
         MessageContext:= 'O valor unitário informado é menor do que o preço de venda cadastrado.';
-        raise EFireDACPedidoProdutoBusinessException.Create(MessageContext);
+        raise EServicePedidoProdutoBusinessException.Create(MessageContext);
       end;
 
     if Entity.ValorUnitario <= 0.00 then
       begin
         MessageContext:= 'Informe um preço de venda maior do que zero.';
-        raise EFireDACPedidoProdutoBusinessException.Create(MessageContext);
+        raise EServicePedidoProdutoBusinessException.Create(MessageContext);
       end;
 
   finally
