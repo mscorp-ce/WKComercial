@@ -44,7 +44,12 @@ uses
   uModel.Services.PedidoProduto in 'model\services\uModel.Services.PedidoProduto.pas',
   uController.PedidoProduto in 'controller\uController.PedidoProduto.pas',
   uController.Produto in 'controller\uController.Produto.pas',
-  uModel.uModel.Services.Exception.EServicePedidoDadosGeraisBusinessException in 'model\services\exception\uModel.uModel.Services.Exception.EServicePedidoDadosGeraisBusinessException.pas';
+  uModel.uModel.Services.Exception.EServicePedidoDadosGeraisBusinessException in 'model\services\exception\uModel.uModel.Services.Exception.EServicePedidoDadosGeraisBusinessException.pas',
+  uController.PedidoDadosGerais in 'controller\uController.PedidoDadosGerais.pas',
+  uModel.Services.PedidoDadosGerais in 'model\services\uModel.Services.PedidoDadosGerais.pas',
+  uModel.uModel.Services.Exception.EServiceClienteBusinessException in 'model\services\exception\uModel.uModel.Services.Exception.EServiceClienteBusinessException.pas',
+  uModel.uModel.Services.Exception.EServiceProdutoBusinessException in 'model\services\uModel.uModel.Services.Exception.EServiceProdutoBusinessException.pas',
+  uController.Cliente in 'controller\uController.Cliente.pas';
 
 {$R *.res}
 

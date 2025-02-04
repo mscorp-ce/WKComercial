@@ -188,6 +188,11 @@
         <DCCReference Include="controller\uController.PedidoProduto.pas"/>
         <DCCReference Include="controller\uController.Produto.pas"/>
         <DCCReference Include="model\services\exception\uModel.uModel.Services.Exception.EServicePedidoDadosGeraisBusinessException.pas"/>
+        <DCCReference Include="controller\uController.PedidoDadosGerais.pas"/>
+        <DCCReference Include="model\services\uModel.Services.PedidoDadosGerais.pas"/>
+        <DCCReference Include="model\services\exception\uModel.uModel.Services.Exception.EServiceClienteBusinessException.pas"/>
+        <DCCReference Include="model\services\uModel.uModel.Services.Exception.EServiceProdutoBusinessException.pas"/>
+        <DCCReference Include="controller\uController.Cliente.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
