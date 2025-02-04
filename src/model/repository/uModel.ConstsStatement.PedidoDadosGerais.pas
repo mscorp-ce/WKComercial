@@ -33,10 +33,10 @@ const
   QUERY_DADOS_GERAIS_CLAUSE_WHERE_BY_NUMERO_PEDIDO = QUERY_PEDIDO_DADOS_GERAIS + sLineBreak + QUERY_CLAUSE_WHERE_BY_NUMERO_PEDIDO;
 
   QUERY_UPDATE_DADOS_GERAIS_BY_NUMERO_PEDIDO =
-    'UPDATE pedidos_produtos ' + sLineBreak +
-    '   SET quantidade = :quantidade, ' + sLineBreak +
-    '       valor_unitario = :valor_unitario, ' + sLineBreak +
-    '       valor_total = valor_total ' + sLineBreak +
+    'UPDATE pedidos_dados_gerais ' + sLineBreak +
+    '   SET data_emissao = :data_emissao, ' + sLineBreak +
+    '       codigo_cliente = :codigo_cliente, ' + sLineBreak +
+    '       valor_total = :valor_total ' + sLineBreak +
     QUERY_CLAUSE_WHERE_BY_NUMERO_PEDIDO;
 
   QUERY_DELETE_DADOS_GERAIS_BY_NUMERO_PEDIDO_NUMERO_PEDIDO =
