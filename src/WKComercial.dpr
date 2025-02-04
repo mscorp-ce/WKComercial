@@ -40,10 +40,11 @@ uses
   uModel.ConstsStatement.Produtos in 'model\repository\uModel.ConstsStatement.Produtos.pas',
   uView.Data.Definition.Produto in 'view\data\definition\uView.Data.Definition.Produto.pas',
   uView.DataConverter.Produto in 'view\uView.DataConverter.Produto.pas',
-  uModel.uModel.Services.Exception.EFireDACPedidoProdutoBusinessException in 'model\services\exception\uModel.uModel.Services.Exception.EFireDACPedidoProdutoBusinessException.pas',
+  uModel.uModel.Services.Exception.EServicePedidoProdutoBusinessException in 'model\services\exception\uModel.uModel.Services.Exception.EServicePedidoProdutoBusinessException.pas',
   uModel.Services.PedidoProduto in 'model\services\uModel.Services.PedidoProduto.pas',
   uController.PedidoProduto in 'controller\uController.PedidoProduto.pas',
-  uController.Produto in 'controller\uController.Produto.pas';
+  uController.Produto in 'controller\uController.Produto.pas',
+  uModel.uModel.Services.Exception.EServicePedidoDadosGeraisBusinessException in 'model\services\exception\uModel.uModel.Services.Exception.EServicePedidoDadosGeraisBusinessException.pas';
 
 {$R *.res}
 
