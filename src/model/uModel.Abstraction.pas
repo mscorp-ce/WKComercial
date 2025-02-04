@@ -91,6 +91,10 @@ type
   IService<T: class> = interface(IPersistence<T>)
   ['{5E47E4E7-D251-4AD9-BA5E-00B5DBAAD58C}']
     function IsValid(Entity: T; out MessageContext: String): Boolean; overload;
+  end;
+
+  IDominio<T: class> = interface(IService<T>)
+  ['{1986F161-6CD0-482D-ACF9-43EF9F6DB6AC}']
     function IsValid(Entity: T; const Memory: IMemory): Boolean; overload;
   end;
 
