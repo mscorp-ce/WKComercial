@@ -150,7 +150,7 @@ function TPedidoDadosGeraisService.Update(Entity: TPedidoDadosGerais): Boolean;
 var
   MessageContext: String;
 begin
-  if not IsValid(Entity, MessageContext) then
+  if not IsValid(Entity, FMemory) then
     raise EServicePedidoDadosGeraisBusinessException.Create(MessageContext);
 
   Result := PedidoDadosGeraisRepository.Update(Entity);
