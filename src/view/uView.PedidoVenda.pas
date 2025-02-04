@@ -138,12 +138,14 @@ begin
       on E: Exception do
         begin
           Transaction.Rollback();
+
+          ShowMessage('Erro ao gravar o pedido: ' + E.Message);
         end;
     end;
 
  except
     on E: Exception do
-      ShowMessage(E.Message);
+      ShowMessage('Erro inesperado ao processar o pedido: ' + E.Message);
   end;
 end;
 
