@@ -31,7 +31,7 @@ implementation
 { TProdutoService }
 
 uses
-  System.SysUtils, uModel.Repository.Produto, Vcl.Dialogs;
+  System.SysUtils, uModel.Repository.Produto, uModel.uModel.Services.Exception.EServiceProdutoBusinessException;
 
 function TProdutoService.CommandSQL(): string;
 begin
@@ -107,22 +107,26 @@ function TProdutoService.Save(Entity: TProduto): Boolean;
 var
   MessageContext: String;
 begin
-  Result := False;
+  if not IsValid(Entity, MessageContext) then
+    raise EServiceProdutoBusinessException.Create(MessageContext);
 
-  if IsValid(Entity, MessageContext) then
-    Result := ProdutoRepository.Save(Entity)
-  else ShowMessage(MessageContext);
+  Result := ProdutoRepository.Save(Entity);
+
+  if not Result then
+    raise EServiceProdutoBusinessException.Create('Erro ao tentar salvar o produto.');
 end;
 
 function TProdutoService.Update(Entity: TProduto): Boolean;
 var
   MessageContext: String;
 begin
-  Result := False;
+  if not IsValid(Entity, MessageContext) then
+    raise EServiceProdutoBusinessException.Create(MessageContext);
 
-  if IsValid(Entity, MessageContext) then
-    Result := ProdutoRepository.Update(Entity)
-  else ShowMessage(MessageContext);
+  Result := ProdutoRepository.Update(Entity);
+
+  if not Result then
+    raise EServiceProdutoBusinessException.Create('Erro ao tentar alterar um produto.');
 end;
 
 end.
