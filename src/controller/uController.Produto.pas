@@ -9,7 +9,6 @@ type
   TControllerProduto = class(TInterfacedObject, IController<TProduto>)
   private
     ProdutoService: IService<TProduto>;
-
   public
     function Fields(): TStrings;
     function CommandSQL(): String;
