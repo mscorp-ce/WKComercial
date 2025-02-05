@@ -81,6 +81,7 @@ object frmPedidoVenda: TfrmPedidoVenda
       ImageIndex = 7
       Images = ImgLista
       TabOrder = 5
+      OnClick = btnCarregarPedidoClick
     end
     object edtCliente: TEdit
       Left = 230

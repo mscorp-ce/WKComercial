@@ -55,6 +55,7 @@ type
     procedure edtClienteChange(Sender: TObject);
     procedure edtClienteKeyPress(Sender: TObject; var Key: Char);
     procedure btnCancelarPedidoClick(Sender: TObject);
+    procedure btnCarregarPedidoClick(Sender: TObject);
   private
     { Private declarations }
     Memory: IMemory;
@@ -73,7 +74,7 @@ type
     procedure SetRegistrosItens();
     procedure CalcularTotal();
     procedure CalcularValorTotal(const Quantidade, ValorUnit: String);
-    procedure InserirProdutos();
+    procedure InserirProdutos(const APedidoProduto: TPedidoProduto; const CarregarPedido: Boolean = False);
     procedure EditarProdutos();
     procedure LimparCampos();
     procedure ExecuteKeyPress(Sender: TObject; var Key: Char);
@@ -81,11 +82,13 @@ type
     procedure ExecuteCancelarLetrasKeyPress(Sender: TObject; var Key: Char);
     procedure ExecuteTrocarPontoPorVirguaKeyPress(Sender: TObject; var Key: Char);
     procedure ExecuteCancelarTrocarPontoOuVirguaKeyPress(Sender: TObject; var Key: Char);
+    function AllCharsInSet(const Value: String; const CharSet: TSysCharSet): Boolean;
 
+    function RetornarPedido(): Integer;
     procedure GravarPedido();
     procedure GravarPedidoProduto();
     procedure AlterarPedidoProduto();
-    function AllCharsInSet(const Value: String; const CharSet: TSysCharSet): Boolean;
+    procedure CarregarPedido();
   protected
     { Protected declarations }
     procedure DoShow(); override;
@@ -126,29 +129,48 @@ end;
 
 procedure TfrmPedidoVenda.btnCancelarPedidoClick(Sender: TObject);
 begin
-  var NumeroPedido: String;
+  var NumeroPedido := RetornarPedido();
 
-  if InputQuery('Informe um número de pedido', 'Número do pedido', NumeroPedido) then
+  if NumeroPedido > 0 then
     begin
-      if not NumeroPedido.IsEmpty() then
-        begin
-          if not AllCharsInSet(NumeroPedido, ['0'..'9']) then
-            begin
-              ShowMessage('O número do pedido deve conter apenas dígitos numéricos.');
-              Exit();
-            end;
-
-          var LPedidoDadosGerais := ControllerPedidoDadosGerais.FindById(NumeroPedido.ToInteger());
-          try
-            if LPedidoDadosGerais.NumeroPedido > 0 then
-              ControllerPedidoDadosGerais.DeleteById(LPedidoDadosGerais)
-            else
-              ShowMessage('Informe um número do pedido válido.');
-          finally
-            LPedidoDadosGerais.Free();
-          end;
-        end;
+      var LPedidoDadosGerais := ControllerPedidoDadosGerais.FindById(NumeroPedido);
+      try
+        if LPedidoDadosGerais.NumeroPedido > 0 then
+          ControllerPedidoDadosGerais.DeleteById(LPedidoDadosGerais)
+        else
+          ShowMessage('Informe um número do pedido válido.');
+      finally
+        LPedidoDadosGerais.Free();
+      end;
     end;
+end;
+
+procedure TfrmPedidoVenda.CarregarPedido();
+begin
+  var NumeroPedido := RetornarPedido();
+
+  if NumeroPedido > 0 then
+    begin
+      var LPedidoDadosGerais := ControllerPedidoDadosGerais.FindById(NumeroPedido);
+      try
+        for var LPedidoProduto in LPedidoDadosGerais.Produtos do
+          begin
+            edtNumeroPedido.Text := LPedidoDadosGerais.NumeroPedido.ToString();
+            capStartDate.Date    := LPedidoDadosGerais.DataEmissao;
+            edtCliente.Text      := LPedidoDadosGerais.Cliente.Codigo.ToString();
+
+            InserirProdutos(LPedidoProduto, True);
+         end;
+
+      finally
+        FreeAndNil(LPedidoDadosGerais);
+      end;
+    end;
+end;
+
+procedure TfrmPedidoVenda.btnCarregarPedidoClick(Sender: TObject);
+begin
+  CarregarPedido();
 end;
 
 procedure TfrmPedidoVenda.btnClientesClick(Sender: TObject);
@@ -262,7 +284,7 @@ begin
   try
     if PedidoProdutoController.IsValid(PedidoProduto, MessageContext) and (Memory.State in[dsOpening, dsInsert]) then
       begin
-        InserirProdutos();
+        InserirProdutos(PedidoProduto);
         LimparCampos();
         edtCodProduto.SetFocus();
         Memory.Data.Open();
@@ -430,14 +452,16 @@ begin
     SetRegistrosItens();
 end;
 
-procedure TfrmPedidoVenda.InserirProdutos();
+procedure TfrmPedidoVenda.InserirProdutos(const APedidoProduto: TPedidoProduto; const CarregarPedido: Boolean);
 begin
   Memory.Data.Append();
-  Memory.Data.FieldByName('codigo_produto').AsInteger := PedidoProduto.Produto.Codigo;
-  Memory.Data.FieldByName('nome_produto').AsString := PedidoProduto.Produto.Descricao;
-  Memory.Data.FieldByName('quantidade').AsCurrency := PedidoProduto.Quantidade;
-  Memory.Data.FieldByName('valor_unitario').AsCurrency := PedidoProduto.ValorUnitario;
-  Memory.Data.FieldByName('valor_total').AsCurrency := PedidoProduto.ValorTotal;
+  if CarregarPedido then
+    Memory.Data.FieldByName('autoincrem').AsInteger := APedidoProduto.AutoIncrem;
+  Memory.Data.FieldByName('codigo_produto').AsInteger := APedidoProduto.Produto.Codigo;
+  Memory.Data.FieldByName('nome_produto').AsString := APedidoProduto.Produto.Descricao;
+  Memory.Data.FieldByName('quantidade').AsCurrency := APedidoProduto.Quantidade;
+  Memory.Data.FieldByName('valor_unitario').AsCurrency := APedidoProduto.ValorUnitario;
+  Memory.Data.FieldByName('valor_total').AsCurrency := APedidoProduto.ValorTotal;
   Memory.Data.Post();
 end;
 
@@ -461,6 +485,27 @@ begin
   edtQuantidade.Text := '';
   edtValorUnitatio.Text := '';
   edtTotal.Text := '';
+end;
+
+function TfrmPedidoVenda.RetornarPedido(): Integer;
+begin
+  Result := 0;
+
+  var NumeroPedido: String;
+
+  if InputQuery('Informe um número de pedido', 'Número do pedido', NumeroPedido) then
+    begin
+      if not NumeroPedido.IsEmpty() then
+        begin
+          if not AllCharsInSet(NumeroPedido, ['0'..'9']) then
+            begin
+              ShowMessage('O número do pedido deve conter apenas dígitos numéricos.');
+              Exit();
+            end;
+
+          Result := NumeroPedido.ToInteger();
+        end;
+    end;
 end;
 
 procedure TfrmPedidoVenda.edtQuantidadeKeyPress(Sender: TObject; var Key: Char);
