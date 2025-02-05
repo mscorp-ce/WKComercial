@@ -45,11 +45,14 @@ begin
     Statement:= TStatementFactory.GetStatement(DataManager);
 
     Transaction := TModelFireDACTransaction<TFDCustomConnection>.Create(DataManager.Connection);
+    Transaction.StartTransaction();
 
     Statement.Query.SQL.Clear();
     Statement.Query.SQL.Add(QUERY_DELETE_PEDIDO_PRODUTO_CLAUSE_WHERE_BY_AUTOINCREM);
     Statement.Query.Params.ParamByName('autoincrem').AsInteger:= Entity.AutoIncrem;
     Statement.Query.ExecSQL();
+
+    Transaction.Commit();
 
     Result:=  Statement.Query.RowsAffected = ROWS_AFFECTED;
 
