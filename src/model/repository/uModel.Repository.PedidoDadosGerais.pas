@@ -28,7 +28,7 @@ implementation
 uses
   System.SysUtils, FireDAC.Stan.Error, FireDAC.Stan.Param, FireDAC.Comp.Client, uModel.Repository.DataManager, uModel.Design.Factory.StatementFactory,
   uModel.FireDACEngineException, uModel.ConstsStatement.PedidoDadosGerais, uModel.ConstsStatement.Repository.Commun,
-  uModel.FireDAC.Transaction;
+  uModel.FireDAC.Transaction, uModel.Repository.PedidoProduto, uModel.Entities.PedidoProduto;
 
 { TPedidoDadosGeraisRepository }
 
@@ -45,11 +45,14 @@ begin
     Statement:= TStatementFactory.GetStatement(DataManager);
 
     Transaction := TModelFireDACTransaction<TFDCustomConnection>.Create(DataManager.Connection);
+    Transaction.StartTransaction();
 
     Statement.Query.SQL.Clear();
     Statement.Query.SQL.Add(QUERY_DELETE_DADOS_GERAIS_BY_NUMERO_PEDIDO_NUMERO_PEDIDO);
     Statement.Query.Params.ParamByName('numero_pedido').AsInteger:= Entity.NumeroPedido;
     Statement.Query.ExecSQL();
+
+    Transaction.Commit();
 
     Result:=  Statement.Query.RowsAffected = ROWS_AFFECTED;
 
@@ -157,6 +160,19 @@ begin
 
     var PedidoDadosGerais := TPedidoDadosGerais.Create();
     SetProperty(Statement, PedidoDadosGerais);
+
+    var PedidoProdutoRepository: IRepository<TPedidoProduto>;
+
+    PedidoProdutoRepository := TPedidoProdutoRepository.Create();
+
+    var List := PedidoProdutoRepository.FindAll();
+    try
+      for var Pedido in List do
+        PedidoDadosGerais.Produtos.Add(Pedido);
+
+    finally
+      FreeAndNil(List);
+    end;
 
     Result:= PedidoDadosGerais;
 
