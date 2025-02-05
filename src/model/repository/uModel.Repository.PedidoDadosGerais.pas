@@ -26,9 +26,9 @@ type
 implementation
 
 uses
-  System.SysUtils, FireDAC.Stan.Error, FireDAC.Stan.Param, FireDAC.Comp.Client, uModel.Repository.DataManager, uModel.Design.Factory.StatementFactory,
-  uModel.FireDACEngineException, uModel.ConstsStatement.PedidoDadosGerais, uModel.ConstsStatement.Repository.Commun,
-  uModel.FireDAC.Transaction, uModel.Repository.PedidoProduto, uModel.Entities.PedidoProduto;
+  System.SysUtils, FireDAC.Stan.Error, FireDAC.Stan.Param, FireDAC.Comp.Client, uModel.Repository.DataManager,
+  uModel.Design.Factory.StatementFactory, uModel.FireDACEngineException, uModel.ConstsStatement.PedidoDadosGerais,
+  uModel.ConstsStatement.Repository.Commun, uModel.FireDAC.Transaction, uModel.Repository.PedidoProduto, uModel.Entities.PedidoProduto;
 
 { TPedidoDadosGeraisRepository }
 
@@ -170,6 +170,7 @@ begin
       for var Pedido in List do
         begin
           var NovoPedidoProduto := TPedidoProduto.Create();
+
           NovoPedidoProduto.AutoIncrem := Pedido.AutoIncrem;
           NovoPedidoProduto.NumeroPedido := Pedido.NumeroPedido;
           NovoPedidoProduto.Produto.Codigo := Pedido.Produto.Codigo;
