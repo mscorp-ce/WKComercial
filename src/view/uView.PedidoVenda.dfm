@@ -108,6 +108,7 @@ object frmPedidoVenda: TfrmPedidoVenda
       ImageIndex = 5
       Images = ImgLista
       TabOrder = 6
+      OnClick = btnCancelarPedidoClick
     end
     object btnClientes: TButton
       Left = 333

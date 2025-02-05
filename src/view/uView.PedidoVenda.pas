@@ -54,6 +54,7 @@ type
     procedure btnGravarPedidoClick(Sender: TObject);
     procedure edtClienteChange(Sender: TObject);
     procedure edtClienteKeyPress(Sender: TObject; var Key: Char);
+    procedure btnCancelarPedidoClick(Sender: TObject);
   private
     { Private declarations }
     Memory: IMemory;
@@ -82,6 +83,9 @@ type
     procedure ExecuteCancelarTrocarPontoOuVirguaKeyPress(Sender: TObject; var Key: Char);
 
     procedure GravarPedido();
+    procedure GravarPedidoProduto();
+    procedure AlterarPedidoProduto();
+    function AllCharsInSet(const Value: String; const CharSet: TSysCharSet): Boolean;
   protected
     { Protected declarations }
     procedure DoShow(); override;
@@ -98,15 +102,103 @@ implementation
 uses
   uModel.FireDAC.Memory, uView.Data.Definition.PedidoProduto, uView.FormCliente.Consulta, uView.FormProduto.Consulta,
   uController.PedidoProduto, uController.Produto, uController.Cliente, uController.PedidoDadosGerais, uModel.FireDAC.CustomConnection,
-  uModel.Repository.DataManager, uModel.FireDAC.Transaction;
+  uModel.Repository.DataManager, uModel.FireDAC.Transaction, uModel.Repository.PedidoProduto;
 
 {$R *.dfm}
 
 { TfrmPedidoVenda }
 
+function TfrmPedidoVenda.AllCharsInSet(const Value: String; const CharSet: TSysCharSet): Boolean;
+var
+  Element: Char;
+begin
+  Result := True;
+
+  for Element in Value do
+    begin
+      if not CharInSet(Element, CharSet) then
+        begin
+          Result := False;
+          Exit;
+        end;
+    end;
+end;
+
+procedure TfrmPedidoVenda.btnCancelarPedidoClick(Sender: TObject);
+begin
+  var NumeroPedido: String;
+
+  if InputQuery('Informe um número de pedido', 'Número do pedido', NumeroPedido) then
+    begin
+      if not NumeroPedido.IsEmpty() then
+        begin
+          if not AllCharsInSet(NumeroPedido, ['0'..'9']) then
+            begin
+              ShowMessage('O número do pedido deve conter apenas dígitos numéricos.');
+              Exit();
+            end;
+
+          var LPedidoDadosGerais := ControllerPedidoDadosGerais.FindById(NumeroPedido.ToInteger());
+          try
+            if LPedidoDadosGerais.NumeroPedido > 0 then
+              ControllerPedidoDadosGerais.DeleteById(LPedidoDadosGerais)
+            else
+              ShowMessage('Informe um número do pedido válido.');
+          finally
+            LPedidoDadosGerais.Free();
+          end;
+        end;
+    end;
+end;
+
 procedure TfrmPedidoVenda.btnClientesClick(Sender: TObject);
 begin
   ConsultarClientes();
+end;
+
+procedure TfrmPedidoVenda.GravarPedidoProduto();
+begin
+  var PedidoProdutoRepository: IRepository<TPedidoProduto>;
+  PedidoProdutoRepository := TPedidoProdutoRepository.Create();
+
+  var RecNo:= Memory.RecNo;
+
+  Memory.Data.DisableControls();
+  try
+    Memory.Data.First();
+
+    while not Memory.Data.Eof do
+      begin
+        var NovoPedidoProduto := TPedidoProduto.Create();
+
+        NovoPedidoProduto.NumeroPedido   := PedidoDadosGerais.NumeroPedido;
+        NovoPedidoProduto.Produto.Codigo := Memory.Data.FieldByName('codigo_produto').AsInteger;
+        NovoPedidoProduto.Quantidade     := Memory.Data.FieldByName('quantidade').AsCurrency;
+        NovoPedidoProduto.ValorUnitario  := Memory.Data.FieldByName('valor_unitario').AsCurrency;
+        NovoPedidoProduto.ValorTotal     := Memory.Data.FieldByName('valor_total').AsCurrency;
+
+        if PedidoProdutoRepository.Save(NovoPedidoProduto) then
+          begin
+            Memory.Data.Edit();
+
+            Memory.Data.FieldByName('autoincrem').AsInteger := NovoPedidoProduto.AutoIncrem;
+
+            Memory.Data.Post();
+
+            PedidoDadosGerais.Produtos.Add(NovoPedidoProduto);
+          end;
+
+        Memory.Data.Next();
+      end;
+  finally
+    Memory.RecNo := RecNo;
+    Memory.Data.EnableControls();
+  end;
+end;
+
+procedure TfrmPedidoVenda.AlterarPedidoProduto();
+begin
+
 end;
 
 procedure TfrmPedidoVenda.GravarPedido();
@@ -125,10 +217,12 @@ begin
       if PedidoDadosGerais.NumeroPedido = 0 then
         begin
           ControllerPedidoDadosGerais.Save(PedidoDadosGerais);
+          GravarPedidoProduto();
         end
       else
         begin
           ControllerPedidoDadosGerais.Update(PedidoDadosGerais);
+          AlterarPedidoProduto();
         end;
 
       Transaction.Commit();
@@ -166,7 +260,7 @@ begin
   var MessageContext: String;
 
   try
-    if PedidoProdutoController.IsValid(PedidoProduto, MessageContext) and (Memory.State in[dsOpening, dsInsert]) then // Data.IsEmpty() then
+    if PedidoProdutoController.IsValid(PedidoProduto, MessageContext) and (Memory.State in[dsOpening, dsInsert]) then
       begin
         InserirProdutos();
         LimparCampos();
@@ -381,12 +475,22 @@ end;
 
 procedure TfrmPedidoVenda.edtClienteChange(Sender: TObject);
 begin
-  var Cliente := ClienteController.FindById(StrToIntDef(edtCliente.Text, 0));
-  try
-    edtClienteDesc.Text := Cliente.Nome;
-  finally
-    FreeAndNil(Cliente);
-  end;
+  if edtCliente.Text <> '' then
+    begin
+      btnCancelarPedido.Visible:= False;
+
+      var Cliente := ClienteController.FindById(StrToIntDef(edtCliente.Text, 0));
+      try
+        edtClienteDesc.Text := Cliente.Nome;
+      finally
+        FreeAndNil(Cliente);
+      end;
+    end
+  else
+    begin
+      btnCancelarPedido.Visible:= True;
+      edtClienteDesc.Text := '';
+    end;
 end;
 
 procedure TfrmPedidoVenda.edtClienteKeyPress(Sender: TObject; var Key: Char);
