@@ -235,7 +235,9 @@ end;
 procedure TPedidoProdutoRepository.SetStatement(Statement: IStatement; Entity: TPedidoProduto);
 begin
   try
-    Statement.Query.Params.ParamByName('numero_pedido').AsInteger   := Entity.NumeroPedido;
+    if Entity.autoincrem > 0 then
+      Statement.Query.Params.ParamByName('autoincrem').AsInteger   := Entity.autoincrem;
+    Statement.Query.Params.ParamByName('numero_pedido').AsInteger  := Entity.NumeroPedido;
     Statement.Query.Params.ParamByName('codigo_produto').AsInteger  := Entity.Produto.Codigo;
     Statement.Query.Params.ParamByName('quantidade').AsCurrency     := Entity.Quantidade;
     Statement.Query.Params.ParamByName('valor_unitario').AsCurrency := Entity.ValorUnitario;
