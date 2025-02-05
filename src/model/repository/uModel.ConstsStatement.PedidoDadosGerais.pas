@@ -41,7 +41,7 @@ const
 
   QUERY_DELETE_DADOS_GERAIS_BY_NUMERO_PEDIDO_NUMERO_PEDIDO =
     'DELETE ' + sLineBreak +
-    '  FROM pedidos_produtos ' + sLineBreak +
+    '  FROM pedidos_dados_gerais ' + sLineBreak +
     QUERY_CLAUSE_WHERE_BY_NUMERO_PEDIDO;
 
 implementation
