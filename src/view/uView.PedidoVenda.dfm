@@ -3,7 +3,7 @@ object frmPedidoVenda: TfrmPedidoVenda
   Top = 0
   Caption = 'WK - Pedido de vendas'
   ClientHeight = 455
-  ClientWidth = 993
+  ClientWidth = 1098
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -28,11 +28,12 @@ object frmPedidoVenda: TfrmPedidoVenda
   object grbPedido: TGroupBox
     Left = 0
     Top = 0
-    Width = 993
+    Width = 1098
     Height = 80
     Align = alTop
     Caption = '[ Pedido ] '
     TabOrder = 0
+    ExplicitWidth = 993
     object lblCliente: TLabel
       Left = 230
       Top = 26
@@ -158,7 +159,7 @@ object frmPedidoVenda: TfrmPedidoVenda
   object grdItens: TDBGrid
     Left = 0
     Top = 160
-    Width = 993
+    Width = 1098
     Height = 265
     Align = alTop
     DataSource = dsPedido
@@ -258,11 +259,12 @@ object frmPedidoVenda: TfrmPedidoVenda
   object GroupBox1: TGroupBox
     Left = 0
     Top = 80
-    Width = 993
+    Width = 1098
     Height = 80
     Align = alTop
     Caption = '[ Produtos ] '
     TabOrder = 1
+    ExplicitWidth = 993
     object lblCodProduto: TLabel
       Left = 5
       Top = 29
@@ -333,7 +335,7 @@ object frmPedidoVenda: TfrmPedidoVenda
       Top = 46
       Width = 100
       Height = 25
-      Caption = 'Inserir'
+      Caption = 'Inserir/Alterar'
       ImageIndex = 1
       Images = ImgLista
       TabOrder = 6
@@ -344,6 +346,7 @@ object frmPedidoVenda: TfrmPedidoVenda
       Top = 48
       Width = 100
       Height = 23
+      Alignment = taRightJustify
       TabOrder = 0
       OnChange = edtCodProdutoChange
       OnKeyPress = edtCodProdutoKeyPress
@@ -386,7 +389,7 @@ object frmPedidoVenda: TfrmPedidoVenda
       TabOrder = 2
     end
     object btnGravarPedido: TButton
-      Left = 880
+      Left = 989
       Top = 46
       Width = 100
       Height = 25
@@ -405,6 +408,18 @@ object frmPedidoVenda: TfrmPedidoVenda
       Images = ImgLista
       TabOrder = 1
       OnClick = btnProdutosClick
+    end
+    object btnCancelarEdicao: TButton
+      Left = 879
+      Top = 46
+      Width = 106
+      Height = 25
+      Caption = 'Cancelar Edi'#231#227'o'
+      DisabledImageName = 'btnCancelarEdicao'
+      ImageIndex = 5
+      Images = ImgLista
+      TabOrder = 8
+      OnClick = btnCancelarEdicaoClick
     end
   end
   object ImgLista: TImageList
