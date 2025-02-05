@@ -119,6 +119,8 @@ end;
 
 function TModelFireDACMemory.GetRecNo: Integer;
 begin
+  FRecNo := FData.RecNo;
+
   Result := FRecNo;
 end;
 
@@ -142,6 +144,8 @@ end;
 procedure TModelFireDACMemory.SetRecNo(const Value: Integer);
 begin
   FRecNo := Value;
+
+  FData.RecNo := FRecNo;
 end;
 
 procedure TModelFireDACMemory.SetState(const Value: TState);
