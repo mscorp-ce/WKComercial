@@ -23,10 +23,12 @@ const
     '   SELECT PEP.autoincrem, ' + sLineBreak +
     '          PEP.numero_pedido, ' + sLineBreak +
     '          PEP.codigo_produto, ' + sLineBreak +
+    '          PRO.descricao AS nome_produto, ' + sLineBreak +
     '          PEP.quantidade, ' + sLineBreak +
     '          PEP.valor_unitario, ' + sLineBreak +
     '          PEP.valor_total ' + sLineBreak +
-    '     FROM pedidos_produtos PEP ';
+    '     FROM pedidos_produtos PEP ' + sLineBreak +
+    '     JOIN produtos PRO ON PEP.codigo_produto = PRO.codigo ';
 
   QUERY_ORDER_BY_PEDIDO_PRODUTO =
     ' ORDER BY PEP.numero_pedido,  ' + sLineBreak +
