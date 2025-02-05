@@ -57,7 +57,7 @@ const
     '   SET codigo_produto = :codigo_produto, ' + sLineBreak +
     '       quantidade = :quantidade, ' + sLineBreak +
     '       valor_unitario = :valor_unitario, ' + sLineBreak +
-    '       valor_total = :quantidade * :valor_unitario ' + sLineBreak +
+    '       valor_total = :valor_total ' + sLineBreak +
     QUERY_CLAUSE_WHERE_BY_AUTOINCREM;
 
   QUERY_DELETE_PEDIDO_PRODUTO_CLAUSE_WHERE_BY_AUTOINCREM =
