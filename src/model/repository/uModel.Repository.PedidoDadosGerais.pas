@@ -168,7 +168,18 @@ begin
     var List := PedidoProdutoRepository.FindAll();
     try
       for var Pedido in List do
-        PedidoDadosGerais.Produtos.Add(Pedido);
+        begin
+          var NovoPedidoProduto := TPedidoProduto.Create();
+          NovoPedidoProduto.AutoIncrem := Pedido.AutoIncrem;
+          NovoPedidoProduto.NumeroPedido := Pedido.NumeroPedido;
+          NovoPedidoProduto.Produto.Codigo := Pedido.Produto.Codigo;
+          NovoPedidoProduto.Produto.Descricao := Pedido.Produto.Descricao;
+          NovoPedidoProduto.Quantidade := Pedido.Quantidade;
+          NovoPedidoProduto.ValorUnitario := Pedido.ValorUnitario;
+          NovoPedidoProduto.ValorTotal := Pedido.ValorTotal;
+
+          PedidoDadosGerais.Produtos.Add(NovoPedidoProduto);
+        end;
 
     finally
       FreeAndNil(List);
