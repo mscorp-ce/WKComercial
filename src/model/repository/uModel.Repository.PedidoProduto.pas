@@ -219,6 +219,7 @@ begin
     Entity.AutoIncrem     := Statement.Query.FieldByName('autoincrem').AsInteger;
     Entity.NumeroPedido   := Statement.Query.FieldByName('numero_pedido').AsInteger;
     Entity.Produto.Codigo := Statement.Query.FieldByName('codigo_produto').AsInteger;
+    Entity.Produto.Descricao:= Statement.Query.FieldByName('nome_produto').AsString;
     Entity.Quantidade     := Statement.Query.FieldByName('quantidade').AsCurrency;
     Entity.ValorUnitario  := Statement.Query.FieldByName('valor_unitario').AsCurrency;
     Entity.ValorTotal     := Statement.Query.FieldByName('valor_total').AsCurrency;
