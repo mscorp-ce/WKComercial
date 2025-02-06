@@ -33,7 +33,6 @@ object frmPedidoVenda: TfrmPedidoVenda
     Align = alTop
     Caption = '[ Pedido ] '
     TabOrder = 0
-    ExplicitWidth = 993
     object lblCliente: TLabel
       Left = 230
       Top = 26
@@ -91,6 +90,7 @@ object frmPedidoVenda: TfrmPedidoVenda
       Height = 23
       TabOrder = 2
       OnChange = edtClienteChange
+      OnExit = edtClienteExit
       OnKeyPress = edtClienteKeyPress
     end
     object edtClienteDesc: TEdit
@@ -264,7 +264,6 @@ object frmPedidoVenda: TfrmPedidoVenda
     Align = alTop
     Caption = '[ Produtos ] '
     TabOrder = 1
-    ExplicitWidth = 993
     object lblCodProduto: TLabel
       Left = 5
       Top = 29
@@ -369,6 +368,7 @@ object frmPedidoVenda: TfrmPedidoVenda
       Alignment = taRightJustify
       TabOrder = 4
       OnChange = edtValorUnitatioChange
+      OnExit = edtValorUnitatioExit
       OnKeyPress = edtValorUnitatioKeyPress
     end
     object edtTotal: TEdit

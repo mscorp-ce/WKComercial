@@ -58,6 +58,8 @@ type
     procedure btnCancelarPedidoClick(Sender: TObject);
     procedure btnCarregarPedidoClick(Sender: TObject);
     procedure btnCancelarEdicaoClick(Sender: TObject);
+    procedure edtValorUnitatioExit(Sender: TObject);
+    procedure edtClienteExit(Sender: TObject);
   private
     { Private declarations }
     Memory: IMemory;
@@ -95,6 +97,8 @@ type
     procedure AlterarPedidoProduto();
     procedure CarregarPedido();
     procedure CancelarPedido();
+    procedure FinalizarOperacao;
+    procedure Inserir;
   protected
     { Protected declarations }
     procedure DoShow(); override;
@@ -417,7 +421,18 @@ begin
   GravarPedido();
 end;
 
-procedure TfrmPedidoVenda.btnInserirClick(Sender: TObject);
+procedure TfrmPedidoVenda.FinalizarOperacao();
+begin
+  LimparCampos();
+  Memory.Data.Open();
+  CalcularTotal();
+  Memory.State := dsBrowse;
+  edtCodProduto.ReadOnly := False;
+  EditandoProduto := False;
+  edtCodProduto.SetFocus();
+end;
+
+procedure TfrmPedidoVenda.Inserir();
 begin
   if (Memory.State = dsBrowse) then
     Memory.State := dsInsert
@@ -430,25 +445,23 @@ begin
 
   try
     if PedidoProdutoController.IsValid(PedidoProduto, MessageContext) and (Memory.State in[dsOpening, dsInsert]) then
-      begin
-        InserirProdutos(PedidoProduto);
-        LimparCampos();
-        edtCodProduto.SetFocus();
-        Memory.Data.Open();
-        CalcularTotal();
-      end
-    else EditarProdutos();
+      InserirProdutos(PedidoProduto)
+    else
+      EditarProdutos();
 
-    EditandoProduto := False;
-
-    Memory.State:= dsBrowse;
-    edtCodProduto.ReadOnly := False;
+    FinalizarOperacao();
 
     MessageContext:= '';
+
   except
     on E: Exception do
       ShowMessage(E.Message);
   end;
+end;
+
+procedure TfrmPedidoVenda.btnInserirClick(Sender: TObject);
+begin
+  Inserir();
 end;
 
 procedure TfrmPedidoVenda.btnProdutosClick(Sender: TObject);
@@ -626,10 +639,6 @@ begin
   Memory.Data.FieldByName('quantidade').AsCurrency := StrToFloatDef(edtQuantidade.Text, 0);
   Memory.Data.FieldByName('valor_unitario').AsCurrency := StrToFloatDef(edtValorUnitatio.Text, 0 );
   Memory.Data.FieldByName('valor_total').AsCurrency := StrToFloatDef(edtTotal.Text, 0);
-
-  Memory.Data.Post();
-  CalcularTotal();
-  LimparCampos();
 end;
 
 procedure TfrmPedidoVenda.LimparCampos();
@@ -711,6 +720,11 @@ begin
     end;
 end;
 
+procedure TfrmPedidoVenda.edtClienteExit(Sender: TObject);
+begin
+  edtCodProduto.SetFocus();
+end;
+
 procedure TfrmPedidoVenda.edtClienteKeyPress(Sender: TObject; var Key: Char);
 begin
   ExecuteKeyPress(Sender, Key);
@@ -739,6 +753,12 @@ end;
 procedure TfrmPedidoVenda.edtValorUnitatioChange(Sender: TObject);
 begin
   CalcularValorTotal(edtQuantidade.Text, edtValorUnitatio.Text);
+end;
+
+procedure TfrmPedidoVenda.edtValorUnitatioExit(Sender: TObject);
+begin
+  Inserir();
+  edtCodProduto.SetFocus();
 end;
 
 procedure TfrmPedidoVenda.SetPedidoProduto();
