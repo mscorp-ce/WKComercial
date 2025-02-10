@@ -88,9 +88,19 @@ type
     function IsValid(Entity: T; out MessageContext: String): Boolean;
   end;
 
+  IControllerDetails<T: class> = interface(IController<T>)
+  ['{39E3F7D1-43E8-4B3F-842C-6CE4E8F06B4D}']
+    function FindAll(Id: Integer): TObjectList<T>;
+  end;
+
   IService<T: class> = interface(IPersistence<T>)
   ['{5E47E4E7-D251-4AD9-BA5E-00B5DBAAD58C}']
-    function IsValid(Entity: T; out MessageContext: String): Boolean; overload;
+    function IsValid(Entity: T; out MessageContext: String): Boolean; //overload;
+  end;
+
+  IServiceDetails<T: class> = interface(IService<T>)
+  ['{9BD7B4EA-2156-49B5-A4BA-1DC1F25F5D78}']
+    function FindAll(Id: Integer): TObjectList<T>;
   end;
 
   IDomain<T: class> = interface(IService<T>)
@@ -103,6 +113,11 @@ type
     procedure SetStatement(Statement: IStatement; Entity: T);
     procedure SetProperty(Statement: IStatement; Entity: T);
     procedure PopulateListEntitie(var List: TObjectList<T>; const Statement: IStatement);
+  end;
+
+  IRepositoryDetails<T: class> = interface(IRepository<T>)
+  ['{5C6DF33E-F881-42EC-B91E-3AA8457850E2}']
+    function FindAll(Id: Integer): TObjectList<T>; overload;
   end;
 
   IDataConverter<T: class> = interface
