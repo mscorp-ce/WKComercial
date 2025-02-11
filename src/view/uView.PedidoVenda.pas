@@ -30,7 +30,6 @@ type
     edtValorUnitatio: TEdit;
     edtTotal: TEdit;
     edtDescricao: TEdit;
-    btnGravarPedido: TButton;
     btnClientes: TButton;
     ImgLista: TImageList;
     btnProdutos: TButton;
@@ -40,6 +39,8 @@ type
     Label1: TLabel;
     edtNumeroPedido: TEdit;
     btnCancelarEdicao: TButton;
+    btnGravarPedido: TButton;
+    btnNovoPedido: TButton;
     procedure btnClientesClick(Sender: TObject);
     procedure btnProdutosClick(Sender: TObject);
     procedure stbRodapeDrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel; const Rect: TRect);
@@ -60,11 +61,12 @@ type
     procedure btnCancelarEdicaoClick(Sender: TObject);
     procedure edtValorUnitatioExit(Sender: TObject);
     procedure edtClienteExit(Sender: TObject);
+    procedure btnNovoPedidoClick(Sender: TObject);
   private
     { Private declarations }
     Memory: IMemory;
 
-    PedidoProdutoController: IController<TPedidoProduto>;
+    PedidoProdutoController: IControllerDetails<TPedidoProduto>;
     ProdutoController: IController<TProduto>;
     ClienteController: IController<TCliente>;
     PedidoDadosGerais: TPedidoDadosGerais;
@@ -92,13 +94,15 @@ type
     function AllCharsInSet(const Value: String; const CharSet: TSysCharSet): Boolean;
 
     function RetornarPedido(): Integer;
+    procedure NovoPedido();
     procedure GravarPedido();
     procedure GravarPedidoProduto();
     procedure AlterarPedidoProduto();
     procedure CarregarPedido();
     procedure CancelarPedido();
-    procedure FinalizarOperacao;
-    procedure Inserir;
+    procedure FinalizarOperacao();
+    procedure Inserir();
+
   protected
     { Protected declarations }
     procedure DoShow(); override;
@@ -151,6 +155,7 @@ begin
             LimparCamposPedidoDadosGerais();
             Memory.Data.EmptyDataSet();
             CalcularTotal();
+            ShowMessage('Pedido cancelado com sucesso!');
           end
         else
           ShowMessage('Informe um número do pedido válido.');
@@ -175,55 +180,48 @@ end;
 
 procedure TfrmPedidoVenda.CarregarPedido();
 begin
-  var NumeroPedido := RetornarPedido();
+  Memory.Data.EmptyDataSet();
+  PedidoDadosGerais.Produtos.Clear();
 
-  Memory.State:= dsBrowse;
+  var NumeroPedido := RetornarPedido();
+  Memory.State := dsBrowse;
 
   if NumeroPedido > 0 then
     begin
       var LPedidoDadosGerais := ControllerPedidoDadosGerais.FindById(NumeroPedido);
       try
-      if LPedidoDadosGerais.NumeroPedido > 0 then
-        begin
-          Memory.Data.EmptyDataSet();
+        if LPedidoDadosGerais.NumeroPedido > 0 then
+          begin
+            for var Pedido in LPedidoDadosGerais.Produtos do
+              begin
+                var NovoPedidoProduto := TPedidoProduto.Create();
+                NovoPedidoProduto.AutoIncrem := Pedido.AutoIncrem;
+                NovoPedidoProduto.NumeroPedido := Pedido.NumeroPedido;
+                NovoPedidoProduto.Produto.Codigo := Pedido.Produto.Codigo;
+                NovoPedidoProduto.Produto.Descricao := Pedido.Produto.Descricao;
+                NovoPedidoProduto.Quantidade := Pedido.Quantidade;
+                NovoPedidoProduto.ValorUnitario := Pedido.ValorUnitario;
+                NovoPedidoProduto.ValorTotal := Pedido.ValorTotal;
+                PedidoDadosGerais.Produtos.Add(NovoPedidoProduto);
 
-          if PedidoDadosGerais.Produtos.Count = 0 then
-            begin
-              for var Pedido in LPedidoDadosGerais.Produtos do
-                begin
-                  var NovoPedidoProduto := TPedidoProduto.Create();
+                InserirProdutos(NovoPedidoProduto, True);
+              end;
 
-                  NovoPedidoProduto.AutoIncrem := Pedido.AutoIncrem;
-                  NovoPedidoProduto.NumeroPedido := Pedido.NumeroPedido;
-                  NovoPedidoProduto.Produto.Codigo := Pedido.Produto.Codigo;
-                  NovoPedidoProduto.Produto.Descricao := Pedido.Produto.Descricao;
-                  NovoPedidoProduto.Quantidade := Pedido.Quantidade;
-                  NovoPedidoProduto.ValorUnitario := Pedido.ValorUnitario;
-                  NovoPedidoProduto.ValorTotal := Pedido.ValorTotal;
+            PedidoDadosGerais.NumeroPedido := LPedidoDadosGerais.NumeroPedido;
+            edtNumeroPedido.Text := LPedidoDadosGerais.NumeroPedido.ToString();
+            capStartDate.Date := LPedidoDadosGerais.DataEmissao;
+            edtCliente.Text := LPedidoDadosGerais.Cliente.Codigo.ToString();
 
-                  PedidoDadosGerais.Produtos.Add(NovoPedidoProduto);
-                end;
-            end;
-
-          for var LPedidoProduto in LPedidoDadosGerais.Produtos do
-            begin
-              PedidoDadosGerais.NumeroPedido := LPedidoDadosGerais.NumeroPedido;
-              edtNumeroPedido.Text := LPedidoDadosGerais.NumeroPedido.ToString();
-              capStartDate.Date    := LPedidoDadosGerais.DataEmissao;
-              edtCliente.Text      := LPedidoDadosGerais.Cliente.Codigo.ToString();
-
-              InserirProdutos(LPedidoProduto, True);
-            end;
-
-          CalcularTotal();
-        end
-      else
-        ShowMessage('Informe um número do pedido válido.');
+            btnProdutos.Enabled := True;
+            CalcularTotal();
+          end
+        else
+          ShowMessage('Informe um número do pedido válido.');
 
       finally
         FreeAndNil(LPedidoDadosGerais);
       end;
-    end
+    end;
 end;
 
 procedure TfrmPedidoVenda.btnCarregarPedidoClick(Sender: TObject);
@@ -401,7 +399,10 @@ begin
       Transaction.Commit();
 
       edtNumeroPedido.Text := PedidoDadosGerais.NumeroPedido.ToString();
-       except
+
+      ShowMessage('Pedido gravado com sucesso!');
+
+    except
       on E: Exception do
         begin
           Transaction.Rollback();
@@ -464,6 +465,20 @@ begin
   Inserir();
 end;
 
+procedure TfrmPedidoVenda.NovoPedido();
+begin
+  LimparCamposPedidoDadosGerais();
+  LimparCampos();
+  Memory.Data.EmptyDataSet();
+  btnProdutos.Enabled := True;
+  edtCliente.SetFocus();
+end;
+
+procedure TfrmPedidoVenda.btnNovoPedidoClick(Sender: TObject);
+begin
+  NovoPedido();
+end;
+
 procedure TfrmPedidoVenda.btnProdutosClick(Sender: TObject);
 begin
   ConsultarProdutos();
@@ -475,7 +490,7 @@ begin
   try
     FormClienteConsulta.ShowModal();
 
-    edtCliente.Text := FormClienteConsulta.Id.ToString();
+    edtCliente.Text     := FormClienteConsulta.Id.ToString();
     edtClienteDesc.Text := FormClienteConsulta.Descricao;
   finally
     FreeAndNil(FormClienteConsulta);
@@ -488,8 +503,9 @@ begin
   try
     FormProdutoConsulta.ShowModal();
 
-    edtCodProduto.Text := FormProdutoConsulta.Id.ToString();
-    edtDescricao.Text := FormProdutoConsulta.Descricao;
+    edtCodProduto.Text    := FormProdutoConsulta.Id.ToString();
+    edtDescricao.Text     := FormProdutoConsulta.Descricao;
+    edtValorUnitatio.Text := FloatToStr(FormProdutoConsulta.PrecoVenda);
   finally
     FreeAndNil(FormProdutoConsulta);
   end;
@@ -700,6 +716,7 @@ begin
     begin
       btnCancelarPedido.Visible:= False;
       btnCarregarPedido.Visible:= False;
+      btnProdutos.Enabled := True;
 
       var Cliente := ClienteController.FindById(StrToIntDef(edtCliente.Text, 0));
       try
@@ -722,6 +739,12 @@ end;
 
 procedure TfrmPedidoVenda.edtClienteExit(Sender: TObject);
 begin
+  if btnNovoPedido.Focused then
+    Exit();
+
+  if btnCarregarPedido.Focused then
+    Exit();
+
   edtCodProduto.SetFocus();
 end;
 
@@ -734,7 +757,8 @@ procedure TfrmPedidoVenda.edtCodProdutoChange(Sender: TObject);
 begin
   var Produto := ProdutoController.FindById(StrToIntDef(edtCodProduto.Text, 0));
   try
-    edtDescricao.Text := Produto.Descricao;
+    edtDescricao.Text     := Produto.Descricao;
+    edtValorUnitatio.Text := FloatToStr(Produto.PrecoVenda);
   finally
     FreeAndNil(Produto);
   end;
@@ -785,6 +809,7 @@ begin
   edtValorUnitatio.Text := FloatToStr( Memory.Data.FieldByName('valor_unitario').AsCurrency);
   edtTotal.Text     := FloatToStr( Memory.Data.FieldByName('valor_total').AsCurrency);
   edtCodProduto.ReadOnly := True;
+  btnProdutos.Enabled := False;
   edtQuantidade.SetFocus;
 end;
 

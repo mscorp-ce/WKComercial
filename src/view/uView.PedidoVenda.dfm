@@ -1,6 +1,7 @@
 object frmPedidoVenda: TfrmPedidoVenda
   Left = 0
   Top = 0
+  ActiveControl = grdItens
   Caption = 'WK - Pedido de vendas'
   ClientHeight = 455
   ClientWidth = 1098
@@ -73,8 +74,8 @@ object frmPedidoVenda: TfrmPedidoVenda
       ParentFont = False
     end
     object btnCarregarPedido: TButton
-      Left = 732
-      Top = 43
+      Left = 843
+      Top = 12
       Width = 120
       Height = 25
       Caption = 'Carregar Pedido'
@@ -102,7 +103,7 @@ object frmPedidoVenda: TfrmPedidoVenda
       TabOrder = 4
     end
     object btnCancelarPedido: TButton
-      Left = 857
+      Left = 843
       Top = 43
       Width = 120
       Height = 25
@@ -154,6 +155,28 @@ object frmPedidoVenda: TfrmPedidoVenda
       Height = 23
       ReadOnly = True
       TabOrder = 0
+    end
+    object btnGravarPedido: TButton
+      Left = 969
+      Top = 43
+      Width = 120
+      Height = 25
+      Caption = 'Gravar Pedido'
+      ImageIndex = 3
+      Images = ImgLista
+      TabOrder = 7
+      OnClick = btnGravarPedidoClick
+    end
+    object btnNovoPedido: TButton
+      Left = 969
+      Top = 12
+      Width = 120
+      Height = 25
+      Caption = 'Novo Pedido'
+      ImageIndex = 1
+      Images = ImgLista
+      TabOrder = 8
+      OnClick = btnNovoPedidoClick
     end
   end
   object grdItens: TDBGrid
@@ -388,17 +411,6 @@ object frmPedidoVenda: TfrmPedidoVenda
       ReadOnly = True
       TabOrder = 2
     end
-    object btnGravarPedido: TButton
-      Left = 989
-      Top = 46
-      Width = 100
-      Height = 25
-      Caption = 'Gravar Pedido'
-      ImageIndex = 3
-      Images = ImgLista
-      TabOrder = 7
-      OnClick = btnGravarPedidoClick
-    end
     object btnProdutos: TButton
       Left = 108
       Top = 47
@@ -418,7 +430,7 @@ object frmPedidoVenda: TfrmPedidoVenda
       DisabledImageName = 'btnCancelarEdicao'
       ImageIndex = 5
       Images = ImgLista
-      TabOrder = 8
+      TabOrder = 7
       OnClick = btnCancelarEdicaoClick
     end
   end
