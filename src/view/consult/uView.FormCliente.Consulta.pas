@@ -50,10 +50,10 @@ begin
   end;
 end;
 
-procedure TfrmFormClienteConsulta.Confirm;
+procedure TfrmFormClienteConsulta.Confirm();
 begin
   inherited;
-  Id:=   Memory.Data.FieldByName('codigo').AsInteger;
+  Id        := Memory.Data.FieldByName('codigo').AsInteger;
   Descricao := Memory.Data.FieldByName('nome').AsString;
 
   Close();
