@@ -7,9 +7,9 @@ uses
   Data.DB, uModel.Entities.Produto;
 
 type
-  TPedidoProdutoService = class(TInterfacedObject, IService<TPedidoProduto>)
+  TPedidoProdutoService = class(TInterfacedObject, IServiceDetails<TPedidoProduto>)
   private
-    PedidoProdutoRepository: IRepository<TPedidoProduto>;
+    PedidoProdutoRepository: IRepositoryDetails<TPedidoProduto>;
     ProdutoRepository: IRepository<TProduto>;
   public
     function Fields(): TStrings;
@@ -22,6 +22,7 @@ type
     function FindById(Id: Integer): TPedidoProduto;
     function CommandSQL(): string;
     function FindAll(CommandSQL: String): TObjectList<TPedidoProduto>; overload;
+    function FindAll(Id: Integer): TObjectList<TPedidoProduto>; overload;
 
     constructor Create(); reintroduce;
     destructor Destroy(); override;
@@ -80,6 +81,12 @@ end;
 function TPedidoProdutoService.Find(): Integer;
 begin
   Result:= PedidoProdutoRepository.Find();
+end;
+
+function TPedidoProdutoService.FindAll(
+  Id: Integer): TObjectList<TPedidoProduto>;
+begin
+  Result := PedidoProdutoRepository.FindAll(Id);
 end;
 
 function TPedidoProdutoService.FindById(Id: Integer): TPedidoProduto;
