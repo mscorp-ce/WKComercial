@@ -12,6 +12,8 @@ type
   private
     { Private declarations }
     RootControllerProduto: IRootController<TProduto>;
+    FPrecoVenda: Currency;
+    procedure SetPrecoVenda(const Value: Currency);
   protected
     { Protected declarations }
     procedure DoShow(); override;
@@ -21,6 +23,7 @@ type
     procedure Confirm(); override;
   public
     { Public declarations }
+    property PrecoVenda: Currency read FPrecoVenda write SetPrecoVenda;
   end;
 
 var
@@ -53,8 +56,9 @@ end;
 procedure TfrmFormProdutoConsulta.Confirm();
 begin
   inherited;
-  Id:=   Memory.Data.FieldByName('codigo').AsInteger;
-  Descricao := Memory.Data.FieldByName('descricao').AsString;
+  Id         := Memory.Data.FieldByName('codigo').AsInteger;
+  Descricao  := Memory.Data.FieldByName('descricao').AsString;
+  PrecoVenda := Memory.Data.FieldByName('preco_venda').AsCurrency;
 
   Close();
 end;
@@ -82,6 +86,11 @@ procedure TfrmFormProdutoConsulta.Remove();
 begin
   inherited;
 
+end;
+
+procedure TfrmFormProdutoConsulta.SetPrecoVenda(const Value: Currency);
+begin
+  FPrecoVenda := Value;
 end;
 
 end.
