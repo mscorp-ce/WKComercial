@@ -57,7 +57,6 @@ begin
     FConnection := TFDConnection.Create(nil);
     FConnection.DriverName                := TLibary.GetINI('DATA_MYSMQL', 'DriverName');
     FConnection.Params.Values['Server']   := TLibary.GetINI('DATA_MYSMQL', 'Server');
-    FConnection.Params.Values['Server']   := TLibary.GetINI('DATA_MYSMQL', 'Server');
     FConnection.Params.Values['Port']     := TLibary.GetINI('DATA_MYSMQL', 'Port');
     FConnection.Params.Values['Database'] := TLibary.GetINI('DATA_MYSMQL', 'Database');
     FConnection.Params.Values['User_Name']:= TLibary.GetINI('DATA_MYSMQL', 'User_Name');
