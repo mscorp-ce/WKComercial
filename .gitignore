@@ -40,7 +40,6 @@
 *.identcache
 *.mes
 *.otares
-*.ico
 *.projdata
 *.tvsconfig
 *.dsk
@@ -52,7 +51,6 @@ __recovery/
 
 # Arquivos de binários compilados em Delphi
 
-bin/
 dcus/
 
 # Arquivo de estatísticas do Castalia
