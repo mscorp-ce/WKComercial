@@ -59,7 +59,7 @@ implementation
 {$R *.dfm}
 
 uses
-  System.UITypes; //, uView.Consts.Commun;
+  System.UITypes;
 
 function TfrmConsult.ValidateDataSetHasRecords(const Menssage: String): Boolean;
 begin
