@@ -70,8 +70,8 @@ Além disso, o projeto utiliza os seguintes padrões de design:
 
 ## Tecnologias Utilizadas
 
-- **Linguagem de Programação:** Delphi
-- **Banco de Dados:** MySQL (via FireDAC)
+- **Linguagem de Programação:** Delphi 12(Athenas)
+- **Banco de Dados:** MySQL Community-8.0.41.0 (via FireDAC)
 - **Framework:** VCL (Visual Component Library)
 - **Padrões de Projeto:** Repository, Factory
 - **Coleções Genéricas:** `System.Generics.Collections` (ex.: `TDictionary`)
