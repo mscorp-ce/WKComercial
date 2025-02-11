@@ -30,6 +30,12 @@ const
     '     FROM pedidos_produtos PEP ' + sLineBreak +
     '     JOIN produtos PRO ON PEP.codigo_produto = PRO.codigo ';
 
+  QUERY_CLAUSE_WHERE_BY_NUMERO_PEDIDO =
+    ' WHERE PEP.numero_pedido = :numero_pedido ';
+
+  QUERY_PEDIDO_PRODUTOS_CLAUSE_WHERE_NUMERO_PEDIDO =
+    QUERY_PEDIDO_PRODUTOS + sLineBreak +  QUERY_CLAUSE_WHERE_BY_NUMERO_PEDIDO;
+
   QUERY_ORDER_BY_PEDIDO_PRODUTO =
     ' ORDER BY PEP.numero_pedido,  ' + sLineBreak +
     '          PEP.autoincrem ';
@@ -54,7 +60,8 @@ const
 
   QUERY_UPDATE_PEDIDO_PRODUTO_BY_AUTOINCREM =
     'UPDATE pedidos_produtos ' + sLineBreak +
-    '   SET codigo_produto = :codigo_produto, ' + sLineBreak +
+    '   SET numero_pedido = :numero_pedido, ' + sLineBreak +
+    '       codigo_produto = :codigo_produto, ' + sLineBreak +
     '       quantidade = :quantidade, ' + sLineBreak +
     '       valor_unitario = :valor_unitario, ' + sLineBreak +
     '       valor_total = :valor_total ' + sLineBreak +

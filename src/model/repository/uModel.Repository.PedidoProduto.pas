@@ -6,7 +6,7 @@ uses
   System.Classes, System.Generics.Collections, Data.DB, uModel.Abstraction, uModel.Entities.PedidoProduto;
 
 type
-  TPedidoProdutoRepository = class(TInterfacedObject, IRepository<TPedidoProduto>)
+  TPedidoProdutoRepository = class(TInterfacedObject, IRepository<TPedidoProduto>, IRepositoryDetails<TPedidoProduto>)
   private
     procedure SetStatement(Statement: IStatement; Entity: TPedidoProduto);
     procedure SetProperty(Statement: IStatement; Entity: TPedidoProduto);
@@ -21,6 +21,7 @@ type
     function FindById(Id: Integer): TPedidoProduto;
     function CommandSQL(): string;
     function FindAll(): TObjectList<TPedidoProduto>; overload;
+    function FindAll(Id: Integer): TObjectList<TPedidoProduto>; overload;
   end;
 
 implementation
@@ -124,27 +125,9 @@ begin
   end;
 end;
 
-function TPedidoProdutoRepository.FindAll: TObjectList<TPedidoProduto>;
-var
-  Statement: IStatement;
-  List: TObjectList<TPedidoProduto>;
+function TPedidoProdutoRepository.FindAll(): TObjectList<TPedidoProduto>;
 begin
-  try
-    Statement:= TStatementFactory.GetStatement(DataManager);
-    List:= TObjectList<TPedidoProduto>.Create;
-
-    Statement.Query.SQL.Clear();
-    Statement.SQL(QUERY_PEDIDO_PRODUTOS).Open();
-
-    PopulateListEntitie(List, Statement);
-
-    Result:= List;
-  except
-    on Error: EFDDBEngineException do
-      begin
-        raise Exception.Create(TFireDACEngineException.GetMessage(Error));
-      end;
-  end;
+   Result := nil;
 end;
 
 function TPedidoProdutoRepository.FindById(Id: Integer): TPedidoProduto;
@@ -263,6 +246,31 @@ begin
 
     Result:= Statement.Query.RowsAffected = ROWS_AFFECTED;
 
+  except
+    on Error: EFDDBEngineException do
+      begin
+        raise Exception.Create(TFireDACEngineException.GetMessage(Error));
+      end;
+  end;
+end;
+
+function TPedidoProdutoRepository.FindAll(
+  Id: Integer): TObjectList<TPedidoProduto>;
+var
+  Statement: IStatement;
+  List: TObjectList<TPedidoProduto>;
+begin
+  try
+    Statement:= TStatementFactory.GetStatement(DataManager);
+    List:= TObjectList<TPedidoProduto>.Create;
+
+    Statement.Query.SQL.Add(QUERY_PEDIDO_PRODUTOS_CLAUSE_WHERE_NUMERO_PEDIDO);
+    Statement.Query.Params.ParamByName('numero_pedido').AsInteger:= Id;
+    Statement.Query.Open();
+
+    PopulateListEntitie(List, Statement);
+
+    Result:= List;
   except
     on Error: EFDDBEngineException do
       begin
