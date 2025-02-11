@@ -161,11 +161,11 @@ begin
     var PedidoDadosGerais := TPedidoDadosGerais.Create();
     SetProperty(Statement, PedidoDadosGerais);
 
-    var PedidoProdutoRepository: IRepository<TPedidoProduto>;
+    var PedidoProdutoRepository: IRepositoryDetails<TPedidoProduto>;
 
     PedidoProdutoRepository := TPedidoProdutoRepository.Create();
 
-    var List := PedidoProdutoRepository.FindAll();
+    var List := PedidoProdutoRepository.FindAll(Id);
     try
       for var Pedido in List do
         begin
@@ -259,7 +259,6 @@ begin
   try
     Statement.Query.Params.ParamByName('data_emissao').AsDateTime := Entity.DataEmissao;
     Statement.Query.Params.ParamByName('codigo_cliente').AsInteger := Entity.Cliente.Codigo;
-    Statement.Query.Params.ParamByName('valor_total').AsCurrency := Entity.ValorTotal;
 
   except
     on Error: EFDDBEngineException do
