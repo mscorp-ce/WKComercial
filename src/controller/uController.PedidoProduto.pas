@@ -6,9 +6,9 @@ uses
   System.Classes, System.Generics.Collections, uModel.Abstraction, uModel.Entities.PedidoProduto;
 
 type
-  TControllerPedidoProduto = class(TInterfacedObject, IController<TPedidoProduto>)
+  TControllerPedidoProduto = class(TInterfacedObject, IControllerDetails<TPedidoProduto>)
   private
-    PedidoProdutoService: IService<TPedidoProduto>;
+    PedidoProdutoService: IServiceDetails<TPedidoProduto>;
   public
     function Fields(): TStrings;
     function CommandSQL(): String;
@@ -21,7 +21,7 @@ type
     function Find(): Integer;
     function FindById(Id: Integer): TPedidoProduto;
     function FindAll(CommandSQL: String): TObjectList<TPedidoProduto>; overload;
-
+    function FindAll(Id: Integer): TObjectList<TPedidoProduto>; overload;
     constructor Create(); reintroduce;
     destructor Destroy(); override;
   end;
@@ -71,14 +71,20 @@ begin
   Result:= PedidoProdutoService.Find();
 end;
 
-function TControllerPedidoProduto.FindAll: TObjectList<TPedidoProduto>;
+function TControllerPedidoProduto.FindAll(
+  Id: Integer): TObjectList<TPedidoProduto>;
 begin
-  Result:= PedidoProdutoService.FindAll();
+  Result:= PedidoProdutoService.FindAll(Id);
+end;
+
+function TControllerPedidoProduto.FindAll(): TObjectList<TPedidoProduto>;
+begin
+  Result:= nil;
 end;
 
 function TControllerPedidoProduto.FindAll(CommandSQL: String): TObjectList<TPedidoProduto>;
 begin
-  Result:= PedidoProdutoService.FindAll(CommandSQL);
+  Result:= nil;
 end;
 
 function TControllerPedidoProduto.FindById(Id: Integer): TPedidoProduto;
