@@ -20,8 +20,8 @@ const
   QUERY_PEDIDO_DADOS_GERAIS_ORDER_BY = QUERY_PEDIDO_DADOS_GERAIS + sLineBreak + QUERY_ORDER_BY_PEDIDO_DADOS_GERAIS;
 
   QUERY_INSERT_PEDIDO_DADOS_GERAIS =
-    'INSERT INTO pedidos_dados_gerais (data_emissao, codigo_cliente, valor_total) ' + sLineBreak +
-    'VALUES (:data_emissao, :codigo_cliente, :valor_total) ';
+    'INSERT INTO pedidos_dados_gerais (data_emissao, codigo_cliente) ' + sLineBreak +
+    'VALUES (:data_emissao, :codigo_cliente) ';
 
   QUERY_PEDIDO_DADOS_GERAIS_LAST_INSERT_ID =
     'SELECT LAST_INSERT_ID() AS numero_pedido ';
@@ -35,8 +35,7 @@ const
   QUERY_UPDATE_DADOS_GERAIS_BY_NUMERO_PEDIDO =
     'UPDATE pedidos_dados_gerais ' + sLineBreak +
     '   SET data_emissao = :data_emissao, ' + sLineBreak +
-    '       codigo_cliente = :codigo_cliente, ' + sLineBreak +
-    '       valor_total = :valor_total ' + sLineBreak +
+    '       codigo_cliente = :codigo_cliente' + sLineBreak +
     QUERY_CLAUSE_WHERE_BY_NUMERO_PEDIDO;
 
   QUERY_DELETE_DADOS_GERAIS_BY_NUMERO_PEDIDO_NUMERO_PEDIDO =
