@@ -33,7 +33,7 @@ implementation
 { TPedidoProdutoService }
 
 uses
-  System.SysUtils, uModel.Repository.PedidoProduto, uModel.uModel.Services.Exception.EServicePedidoProdutoBusinessException,
+  System.SysUtils, uModel.Repository.PedidoProduto, uModel.Services.Exception.EServicePedidoProdutoBusinessException,
   uModel.Repository.Produto;
 
 function TPedidoProdutoService.CommandSQL(): string;

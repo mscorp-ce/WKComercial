@@ -1,4 +1,4 @@
-unit uModel.uModel.Services.Exception.EServiceClienteBusinessException;
+unit uModel.Services.Exception.EServiceClienteBusinessException;
 
 interface
 

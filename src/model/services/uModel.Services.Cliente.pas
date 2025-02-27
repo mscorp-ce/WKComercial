@@ -31,7 +31,7 @@ implementation
 { TClienteService }
 
 uses
-  System.SysUtils, uModel.Repository.Cliente, uModel.uModel.Services.Exception.EServiceClienteBusinessException;
+  System.SysUtils, uModel.Repository.Cliente, uModel.Services.Exception.EServiceClienteBusinessException;
 
 function TClienteService.CommandSQL(): string;
 begin

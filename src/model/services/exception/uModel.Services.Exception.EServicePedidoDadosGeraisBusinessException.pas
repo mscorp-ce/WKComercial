@@ -1,4 +1,4 @@
-unit uModel.uModel.Services.Exception.EServicePedidoDadosGeraisBusinessException;
+unit uModel.Services.Exception.EServicePedidoDadosGeraisBusinessException;
 
 interface
 

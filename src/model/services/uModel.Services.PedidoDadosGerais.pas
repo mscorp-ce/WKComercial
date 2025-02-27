@@ -34,7 +34,7 @@ implementation
 { TPedidoDadosGeraisService }
 
 uses
-  System.SysUtils, uModel.Repository.PedidoDadosGerais, uModel.uModel.Services.Exception.EServicePedidoDadosGeraisBusinessException,
+  System.SysUtils, uModel.Repository.PedidoDadosGerais, uModel.Services.Exception.EServicePedidoDadosGeraisBusinessException,
   uModel.Repository.Cliente;
 
 function TPedidoDadosGeraisService.CommandSQL(): string;

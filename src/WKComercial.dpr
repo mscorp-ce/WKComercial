@@ -40,14 +40,14 @@ uses
   uModel.ConstsStatement.Produtos in 'model\repository\uModel.ConstsStatement.Produtos.pas',
   uView.Data.Definition.Produto in 'view\data\definition\uView.Data.Definition.Produto.pas',
   uView.DataConverter.Produto in 'view\uView.DataConverter.Produto.pas',
-  uModel.uModel.Services.Exception.EServicePedidoProdutoBusinessException in 'model\services\exception\uModel.uModel.Services.Exception.EServicePedidoProdutoBusinessException.pas',
+  uModel.Services.Exception.EServicePedidoProdutoBusinessException in 'model\services\exception\uModel.Services.Exception.EServicePedidoProdutoBusinessException.pas',
   uModel.Services.PedidoProduto in 'model\services\uModel.Services.PedidoProduto.pas',
   uController.PedidoProduto in 'controller\uController.PedidoProduto.pas',
   uController.Produto in 'controller\uController.Produto.pas',
-  uModel.uModel.Services.Exception.EServicePedidoDadosGeraisBusinessException in 'model\services\exception\uModel.uModel.Services.Exception.EServicePedidoDadosGeraisBusinessException.pas',
+  uModel.Services.Exception.EServicePedidoDadosGeraisBusinessException in 'model\services\exception\uModel.Services.Exception.EServicePedidoDadosGeraisBusinessException.pas',
   uController.PedidoDadosGerais in 'controller\uController.PedidoDadosGerais.pas',
   uModel.Services.PedidoDadosGerais in 'model\services\uModel.Services.PedidoDadosGerais.pas',
-  uModel.uModel.Services.Exception.EServiceClienteBusinessException in 'model\services\exception\uModel.uModel.Services.Exception.EServiceClienteBusinessException.pas',
+  uModel.Services.Exception.EServiceClienteBusinessException in 'model\services\exception\uModel.Services.Exception.EServiceClienteBusinessException.pas',
   uModel.uModel.Services.Exception.EServiceProdutoBusinessException in 'model\services\uModel.uModel.Services.Exception.EServiceProdutoBusinessException.pas',
   uController.Cliente in 'controller\uController.Cliente.pas';
 
